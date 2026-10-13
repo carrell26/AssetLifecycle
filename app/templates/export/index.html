@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Export Data{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Export Riwayat Modul</h1>
+    <p class="subtitle">Filter dulu (opsional), lalu unduh riwayat perpindahan modul sebagai file Excel.</p>
+
+    <form method="GET" action="{{ url_for('export.download') }}">
+        <label for="location_id">Lokasi</label>
+        <select id="location_id" name="location_id">
+            <option value="">Semua lokasi</option>
+            {% for l in all_locations %}
+            <option value="{{ l.location_id }}">{{ l.nama_lokasi }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="device_type_id">Tipe Perangkat</label>
+        <select id="device_type_id" name="device_type_id">
+            <option value="">Semua tipe</option>
+            {% for t in all_types %}
+            <option value="{{ t.device_type_id }}">{{ t.nama_tipe }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="date_from">Dari Tanggal</label>
+        <input type="date" id="date_from" name="date_from">
+
+        <label for="date_to">Sampai Tanggal</label>
+        <input type="date" id="date_to" name="date_to">
+
+        <button type="submit">Download Excel</button>
+    </form>
+</div>
+{% endblock %}

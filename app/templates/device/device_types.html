@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Device Type{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Device Type</h1>
+    <p class="subtitle">Tipe perangkat jaringan, misal OTN PSS24 atau Metro. Klik nama untuk kelola slot-nya.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Tipe</th>
+                <th>Vendor</th>
+                <th>Deskripsi</th>
+                <th>Slot</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in types %}
+            <tr>
+                <td>{{ t.nama_tipe }}</td>
+                <td>{{ t.vendor or "-" }}</td>
+                <td>{{ t.deskripsi or "-" }}</td>
+                <td><a href="{{ url_for('device.slot_definitions', device_type_id=t.device_type_id) }}">Kelola slot</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Belum ada Device Type.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h1>Tambah Device Type</h1>
+    <form method="POST">
+        <label for="nama_tipe">Nama Tipe</label>
+        <input type="text" id="nama_tipe" name="nama_tipe" placeholder="Contoh: OTN PSS24" required>
+
+        <label for="vendor">Vendor</label>
+        <input type="text" id="vendor" name="vendor" placeholder="Contoh: Nokia">
+
+        <label for="deskripsi">Deskripsi</label>
+        <input type="text" id="deskripsi" name="deskripsi">
+
+        <button type="submit">Tambah</button>
+    </form>
+</div>
+
+</div>
+{% endblock %}

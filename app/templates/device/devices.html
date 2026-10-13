@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Perangkat{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Perangkat (Devices)</h1>
+    <p class="subtitle">Unit fisik perangkat jaringan di lapangan.</p>
+
+    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;margin-bottom:16px;">
+        <div style="flex:1;">
+            <label for="filter_location">Filter Lokasi</label>
+            <select id="filter_location" name="location_id" onchange="this.form.submit()">
+                <option value="">Semua lokasi</option>
+                {% for l in all_locations %}
+                <option value="{{ l.location_id }}" {% if selected_location == l.location_id %}selected{% endif %}>{{ l.nama_lokasi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex:1;">
+            <label for="filter_type">Filter Tipe</label>
+            <select id="filter_type" name="device_type_id" onchange="this.form.submit()">
+                <option value="">Semua tipe</option>
+                {% for t in all_types %}
+                <option value="{{ t.device_type_id }}" {% if selected_type == t.device_type_id %}selected{% endif %}>{{ t.nama_tipe }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Perangkat</th>
+                <th>Tipe</th>
+                <th>Lokasi</th>
+                <th>Hostname</th>
+                <th>Serial Number</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in devices %}
+            <tr>
+                <td>{{ d.nama_perangkat }}</td>
+                <td>{{ d.device_type.nama_tipe if d.device_type else "-" }}</td>
+                <td>{{ d.location.nama_lokasi if d.location else "-" }}</td>
+                <td>{{ d.hostname or "-" }}</td>
+                <td>{{ d.serial_number or "-" }}</td>
+                <td>{{ d.status or "-" }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">Belum ada perangkat yang cocok dengan filter ini.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h1>Tambah Perangkat</h1>
+    <form method="POST">
+        <label for="device_type_id">Tipe Perangkat</label>
+        <select id="device_type_id" name="device_type_id" required>
+            <option value="" disabled selected>Pilih tipe</option>
+            {% for t in all_types %}
+            <option value="{{ t.device_type_id }}">{{ t.nama_tipe }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="location_id">Lokasi</label>
+        <select id="location_id" name="location_id" required>
+            <option value="" disabled selected>Pilih lokasi</option>
+            {% for l in all_locations %}
+            <option value="{{ l.location_id }}">{{ l.nama_lokasi }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="nama_perangkat">Nama Perangkat</label>
+        <input type="text" id="nama_perangkat" name="nama_perangkat" placeholder="Contoh: PSS24 Palu 1" required>
+
+        <label for="hostname">Hostname</label>
+        <input type="text" id="hostname" name="hostname">
+
+        <label for="serial_number">Serial Number</label>
+        <input type="text" id="serial_number" name="serial_number">
+
+        <label for="status">Status</label>
+        <input type="text" id="status" name="status" placeholder="aktif">
+
+        <button type="submit">Tambah Perangkat</button>
+    </form>
+</div>
+
+</div>
+{% endblock %}

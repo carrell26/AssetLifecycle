@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Scan QR{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Scan QR Perangkat</h1>
+    <p class="subtitle">Arahkan kamera ke QR code yang tertempel di perangkat.</p>
+
+    <div id="reader" style="width:100%;"></div>
+    <p id="scan-status" class="subtitle" style="margin-top:14px;">Menyiapkan kamera&hellip;</p>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        const statusEl = document.getElementById("scan-status");
+        const scanner = new Html5Qrcode("reader");
+
+        function onScanSuccess(decodedText) {
+            statusEl.textContent = "QR terbaca, mengarahkan...";
+            scanner.stop().then(() => {
+                window.location.href = decodedText;
+            });
+        }
+
+        Html5Qrcode.getCameras().then(cameras => {
+            if (cameras && cameras.length) {
+                const cameraId = cameras[cameras.length - 1].id;
+                scanner.start(
+                    cameraId,
+                    { fps: 10, qrbox: 250 },
+                    onScanSuccess
+                );
+                statusEl.textContent = "Arahkan kamera ke QR code.";
+            } else {
+                statusEl.textContent = "Kamera tidak ditemukan di perangkat ini.";
+            }
+        }).catch(err => {
+            statusEl.textContent = "Gagal akses kamera: " + err;
+        });
+    </script>
+</div>
+{% endblock %}

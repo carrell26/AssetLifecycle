@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Import Data{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Import Data dari Excel</h1>
+    <p class="subtitle">
+        Upload file Excel (.xlsx) dari mentor. Kolom yang wajib ada: <code>NE</code>, <code>Location</code>,
+        <code>Mnemonic</code>, <code>Slot</code>, <code>Serial Number</code>. Lokasi (dan Device dari kolom NE)
+        <strong>otomatis dibuat berdasarkan isi Excel</strong> per baris &mdash; jadi 1 file boleh berisi data
+        dari beberapa site sekaligus (Palu 1, Palu 2, Donggala, dst), tidak perlu dipilih manual.
+        Kolom lain (Shelf, Port, Software Load, CLEI, dst) akan diabaikan. Kolom
+        <code>EquipmentServiceState</code> otomatis diterjemahkan ke kondisi RUSAK/IDLE/AKTIF.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="device_type_id">Device Type tujuan</label>
+        <select id="device_type_id" name="device_type_id" required>
+            <option value="" disabled selected>Pilih tipe</option>
+            {% for t in all_types %}
+            <option value="{{ t.device_type_id }}">{{ t.nama_tipe }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="file">File Excel</label>
+        <input type="file" id="file" name="file" accept=".xlsx" required>
+
+        <button type="submit">Import</button>
+    </form>
+</div>
+
+<div class="card">
+    <h1>Histori Import</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama File</th>
+                <th>Jumlah Baris</th>
+                <th>Berhasil</th>
+                <th>Gagal</th>
+                <th>Status</th>
+                <th>Waktu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for imp in imports %}
+            <tr>
+                <td>{{ imp.nama_file }}</td>
+                <td>{{ imp.jumlah_data }}</td>
+                <td>{{ imp.jumlah_berhasil }}</td>
+                <td>{{ imp.jumlah_gagal }}</td>
+                <td>{{ imp.status }}</td>
+                <td>{{ imp.created_at.strftime("%d %b %Y %H:%M") if imp.created_at else "-" }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">Belum ada riwayat import.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %}

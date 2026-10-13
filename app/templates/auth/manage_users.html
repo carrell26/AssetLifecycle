@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Kelola User{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+<div class="card">
+    <h1>Kelola user</h1>
+    <p class="subtitle">Setujui akun Teknisi yang mendaftar sendiri, dan tandai Karyawan TIF sebagai PJ per district.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>District</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {{ user.role }}
+                    {% if user.is_pj %}<span class="badge badge--pj">PJ</span>{% endif %}
+                </td>
+                <td>{{ user.district or "-" }}</td>
+                <td>
+                    {% if user.status == "pending" %}
+                        <span class="badge badge--pending">Menunggu</span>
+                    {% else %}
+                        <span class="badge badge--aktif">Aktif</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.status == "pending" %}
+                    <form class="inline-form" method="POST" action="{{ url_for('auth.approve_user', user_id=user.user_id) }}">
+                        <button type="submit" class="btn btn--small">Setujui</button>
+                    </form>
+                    {% endif %}
+                    {% if user.role == "karyawan_tif" %}
+                    <form class="inline-form" method="POST" action="{{ url_for('auth.toggle_pj', user_id=user.user_id) }}">
+                        <button type="submit" class="btn btn--secondary btn--small">
+                            {{ "Lepas PJ" if user.is_pj else "Jadikan PJ" }}
+                        </button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

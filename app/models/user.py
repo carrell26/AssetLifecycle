@@ -1,0 +1,29 @@
+from datetime import datetime
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from ..extensions import db
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = "user"
+
+    user_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), unique=True)
+    password = db.Column(db.String(255))
+    role = db.Column(db.String(20), nullable=False)  # 'admin' / 'karyawan_tif' / 'teknisi'
+    is_pj = db.Column(db.Boolean, default=False)
+    district = db.Column(db.String(100))
+    status = db.Column(db.String(20), default="aktif")  # 'aktif' / 'pending'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    def set_password(self, raw_password):
+        self.password = generate_password_hash(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password_hash(self.password, raw_password)
+
+    def get_id(self):
+        # Diperlukan Flask-Login: primary key kita bernama user_id, bukan id
+        return str(self.user_id)

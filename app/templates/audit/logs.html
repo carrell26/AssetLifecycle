@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Audit Log &amp; Hash Chain</h1>
+    <p class="subtitle">
+        Ini adalah ledger sistem -- satu-satunya sumber kebenaran riwayat perubahan data, dicatat
+        sebagai rantai hash SHA-256 (append-only, tidak pernah diubah). Klik "Verifikasi Integritas"
+        untuk memastikan tidak ada data yang dimanipulasi.
+    </p>
+    <a href="{{ url_for('audit.verify') }}" class="btn">Verifikasi Integritas</a>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Waktu</th>
+                <th>Aksi</th>
+                <th>Tabel</th>
+                <th>Record ID</th>
+                <th>Oleh</th>
+                <th>Hash</th>
+                <th>Previous Hash</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in entries %}
+            <tr>
+                <td>{{ e.audit_id }}</td>
+                <td>{{ e.created_at.strftime("%d %b %Y %H:%M:%S") if e.created_at else "-" }}</td>
+                <td>{{ e.aksi }}</td>
+                <td>{{ e.table_name }}</td>
+                <td>{{ e.record_id }}</td>
+                <td>{{ e.actor.name if e.actor else "-" }}</td>
+                <td title="{{ e.hash }}"><code>{{ e.hash[:12] }}&hellip;</code></td>
+                <td title="{{ e.previous_hash }}"><code>{{ e.previous_hash[:12] if e.previous_hash else "GENESIS" }}&hellip;</code></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">Belum ada entry audit log.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %}

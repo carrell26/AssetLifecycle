@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Ajukan Perubahan Modul{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Ajukan perubahan modul</h1>
+    <p class="subtitle">
+        {% if current_user.role == "teknisi" %}
+            Pengajuan kamu akan menunggu persetujuan PJ district {{ current_user.district }}.
+        {% else %}
+            Pengajuan kamu langsung tercatat otomatis (auto-approved).
+        {% endif %}
+    </p>
+
+    <form method="POST">
+        <label for="jenis_perubahan">Jenis Perubahan</label>
+        <select id="jenis_perubahan" name="jenis_perubahan" required>
+            <option value="pasang">Pasang (modul baru masuk slot)</option>
+            <option value="pindah">Pindah (dari 1 slot ke slot lain)</option>
+            <option value="lepas">Lepas (modul dilepas total)</option>
+        </select>
+
+        <label>Modul</label>
+        <select name="module_mode" required>
+            <option value="existing">Pilih modul yang sudah ada</option>
+            <option value="baru">Modul baru</option>
+        </select>
+
+        <label for="module_id">Modul yang sudah ada (kalau pilih "sudah ada")</label>
+        <select id="module_id" name="module_id">
+            <option value="">-- pilih modul --</option>
+            {% for m in existing_modules %}
+            <option value="{{ m.modul_id }}">{{ m.serial_number }} ({{ m.module_type.nama_tipe if m.module_type else "-" }})</option>
+            {% endfor %}
+        </select>
+
+        <label for="module_type_id">Tipe Modul (kalau pilih "modul baru")</label>
+        <select id="module_type_id" name="module_type_id">
+            <option value="">-- pilih tipe --</option>
+            {% for t in module_types %}
+            <option value="{{ t.module_type_id }}">{{ t.nama_tipe }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="serial_number">Serial Number (kalau pilih "modul baru")</label>
+        <input type="text" id="serial_number" name="serial_number">
+
+        <hr style="margin:20px 0;border:none;border-top:1px solid var(--line);">
+
+        <label for="from_device_id">Perangkat Asal (isi untuk Pindah/Lepas)</label>
+        <select id="from_device_id" name="from_device_id">
+            <option value="">-- tidak berlaku --</option>
+            {% for d in devices %}
+            <option value="{{ d.device_id }}">{{ d.nama_perangkat }} ({{ d.location.nama_lokasi if d.location else "-" }})</option>
+            {% endfor %}
+        </select>
+
+        <label for="from_slot">Nomor Slot Asal</label>
+        <input type="text" id="from_slot" name="from_slot" placeholder="Contoh: 17">
+
+        <label for="to_device_id">Perangkat Tujuan (isi untuk Pasang/Pindah)</label>
+        <select id="to_device_id" name="to_device_id">
+            <option value="">-- tidak berlaku --</option>
+            {% for d in devices %}
+            <option value="{{ d.device_id }}">{{ d.nama_perangkat }} ({{ d.location.nama_lokasi if d.location else "-" }})</option>
+            {% endfor %}
+        </select>
+
+        <label for="to_slot">Nomor Slot Tujuan</label>
+        <input type="text" id="to_slot" name="to_slot" placeholder="Contoh: 17">
+
+        <label for="alasan">Alasan</label>
+        <input type="text" id="alasan" name="alasan" placeholder="Contoh: upgrade kapasitas">
+
+        <button type="submit">Ajukan</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Slot {{ device_type.nama_tipe }}{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<p><a href="{{ url_for('device.device_types') }}">&larr; Kembali ke Device Type</a></p>
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Slot untuk {{ device_type.nama_tipe }}</h1>
+    <p class="subtitle">Template slot ini berlaku untuk semua unit fisik bertipe {{ device_type.nama_tipe }}.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nomor Slot</th>
+                <th>Nama Slot</th>
+                <th>Posisi</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in slots %}
+            <tr>
+                <td>{{ s.nomor_slot }}</td>
+                <td>{{ s.nama_slot or "-" }}</td>
+                <td>{{ s.posisi or "-" }}</td>
+                <td>{{ s.keterangan or "-" }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Belum ada slot untuk tipe ini.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h1>Tambah Slot</h1>
+    <form method="POST">
+        <label for="nomor_slot">Nomor Slot</label>
+        <input type="text" id="nomor_slot" name="nomor_slot" placeholder="Contoh: 17" required>
+
+        <label for="nama_slot">Nama Slot</label>
+        <input type="text" id="nama_slot" name="nama_slot">
+
+        <label for="posisi">Posisi</label>
+        <input type="text" id="posisi" name="posisi">
+
+        <label for="keterangan">Keterangan</label>
+        <input type="text" id="keterangan" name="keterangan">
+
+        <button type="submit">Tambah Slot</button>
+    </form>
+</div>
+
+</div>
+{% endblock %}

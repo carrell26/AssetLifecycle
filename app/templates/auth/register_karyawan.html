@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Daftarkan Karyawan TIF{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Daftarkan Karyawan TIF</h1>
+    <p class="subtitle">Akun langsung aktif setelah didaftarkan.</p>
+
+    <form method="POST">
+        <label for="name">Nama lengkap</label>
+        <input type="text" id="name" name="name" required autofocus>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password sementara</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="district">District</label>
+        <input type="text" id="district" name="district" placeholder="Contoh: Palu" required>
+
+        <button type="submit">Daftarkan</button>
+    </form>
+</div>
+{% endblock %}

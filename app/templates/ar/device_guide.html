@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Panduan {{ device.nama_perangkat }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>{{ device.nama_perangkat }}</h1>
+    <p class="subtitle">
+        {{ device.device_type.nama_tipe if device.device_type else "-" }} &middot;
+        {{ device.location.nama_lokasi if device.location else "-" }}
+    </p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;">
+        {% for row in slot_rows %}
+        <div style="
+            flex:1 1 130px; min-width:130px; padding:14px; border-radius:8px; text-align:center;
+            {% if row.occupied %}
+                background:#fbe9e7; border:2px solid #c0392b;
+            {% else %}
+                background:#e6f3ea; border:2px solid #2c6e49;
+            {% endif %}
+        ">
+            <div style="font-weight:600; font-size:1.05rem;">Slot {{ row.slot_def.nomor_slot }}</div>
+            {% if row.occupied %}
+                <div style="font-size:0.85rem; margin-top:6px; color:#9c3b2e;">TERISI</div>
+                <div style="font-size:0.8rem; margin-top:4px;">{{ row.module.serial_number if row.module else "-" }}</div>
+                <div style="font-size:0.75rem; color:var(--ink-soft);">{{ row.module.module_type.nama_tipe if row.module and row.module.module_type else "" }}</div>
+            {% else %}
+                <div style="font-size:0.85rem; margin-top:6px; color:#2c6e49;">KOSONG &mdash; siap dipasang</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>Belum ada slot terdaftar untuk tipe perangkat ini.</p>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('module_request.new_request') }}" class="btn" style="margin-top:24px;">
+        Ajukan pasang/pindah modul di perangkat ini
+    </a>
+</div>
+{% endblock %}

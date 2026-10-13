@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}AR Panduan Slot{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Panduan Slot (AR)</h1>
+    <p class="subtitle">
+        Tiap perangkat punya QR code sendiri. Scan QR di lapangan untuk langsung lihat slot mana yang
+        kosong dan bisa dipasangi modul, atau slot mana yang sudah terisi.
+    </p>
+    <a href="{{ url_for('ar.scan') }}" class="btn">Scan QR Sekarang</a>
+</div>
+
+<div class="card">
+    <table>
+        <thead><tr><th>Nama Perangkat</th><th>Lokasi</th><th>QR Code</th><th>Panduan</th></tr></thead>
+        <tbody>
+            {% for d in devices %}
+            <tr>
+                <td>{{ d.nama_perangkat }}</td>
+                <td>{{ d.location.nama_lokasi if d.location else "-" }}</td>
+                <td><a href="{{ url_for('ar.device_qr', device_id=d.device_id) }}" target="_blank">Lihat QR</a></td>
+                <td><a href="{{ url_for('ar.device_guide', device_id=d.device_id) }}">Buka panduan</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Belum ada perangkat.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %} 

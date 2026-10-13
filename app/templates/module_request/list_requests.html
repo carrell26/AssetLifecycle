@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Pengajuan Modul{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card">
+    <h1>Pengajuan perubahan modul</h1>
+    <p class="subtitle"><a href="{{ url_for('module_request.new_request') }}" class="btn">+ Ajukan baru</a></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Jenis</th>
+                <th>Dari</th>
+                <th>Ke</th>
+                <th>Diajukan oleh</th>
+                <th>Status</th>
+                <th>Waktu</th>
+                {% if can_approve %}<th>Aksi</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r.jenis_perubahan }}</td>
+                <td>
+                    {% if r.from_device %}{{ r.from_device.nama_perangkat }} / slot {{ r.from_slot_definition.nomor_slot if r.from_slot_definition else "-" }}{% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if r.to_device %}{{ r.to_device.nama_perangkat }} / slot {{ r.to_slot_definition.nomor_slot if r.to_slot_definition else "-" }}{% else %}-{% endif %}
+                </td>
+                <td>{{ r.requester.name if r.requester else "-" }}</td>
+                <td>
+                    {% if r.status == "PENDING" %}
+                        <span class="badge badge--pending">Menunggu</span>
+                    {% elif r.status in ("APPROVED", "AUTO_APPROVED") %}
+                        <span class="badge badge--aktif">{{ r.status }}</span>
+                    {% else %}
+                        <span class="badge" style="background:#fbe9e7;color:#9c3b2e;">Ditolak</span>
+                    {% endif %}
+                </td>
+                <td>{{ r.created_at.strftime("%d %b %Y %H:%M") if r.created_at else "-" }}</td>
+                {% if can_approve %}
+                <td>
+                    {% if r.status == "PENDING" %}
+                    <form class="inline-form" method="POST" action="{{ url_for('module_request.approve_request', request_id=r.request_id) }}">
+                        <button type="submit" class="btn btn--small">Setujui</button>
+                    </form>
+                    <form class="inline-form" method="POST" action="{{ url_for('module_request.reject_request', request_id=r.request_id) }}">
+                        <button type="submit" class="btn btn--secondary btn--small">Tolak</button>
+                    </form>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% else %}
+            <tr><td colspan="7">Belum ada pengajuan.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %}

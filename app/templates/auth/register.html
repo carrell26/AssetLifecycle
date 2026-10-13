@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Daftar Teknisi{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Daftar sebagai Teknisi</h1>
+    <p class="subtitle">Akun kamu akan menunggu persetujuan Admin sebelum bisa dipakai untuk masuk.</p>
+
+    <form method="POST">
+        <label for="name">Nama lengkap</label>
+        <input type="text" id="name" name="name" required autofocus>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="district">District</label>
+        <input type="text" id="district" name="district" placeholder="Contoh: Palu" required>
+
+        <button type="submit">Daftar</button>
+    </form>
+
+    <p class="form-footer">
+        Sudah punya akun? <a href="{{ url_for('auth.login') }}">Masuk di sini</a>.
+    </p>
+</div>
+{% endblock %}

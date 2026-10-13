@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Lokasi{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Lokasi</h1>
+    <p class="subtitle">Lokasi fisik tempat perangkat terpasang.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Lokasi</th>
+                <th>District</th>
+                <th>Area</th>
+                <th>Alamat</th>
+                <th>Koordinat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in locations %}
+            <tr>
+                <td>{{ l.nama_lokasi }}</td>
+                <td>{{ l.district }}</td>
+                <td>{{ l.area or "-" }}</td>
+                <td>{{ l.alamat or "-" }}</td>
+                <td>
+                    {% if l.latitude and l.longitude %}
+                        {{ l.latitude }}, {{ l.longitude }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Belum ada lokasi.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h1>Tambah Lokasi</h1>
+    <form method="POST">
+        <label for="nama_lokasi">Nama Lokasi</label>
+        <input type="text" id="nama_lokasi" name="nama_lokasi" placeholder="Contoh: Palu 1" required>
+
+        <label for="district">District</label>
+        <input type="text" id="district" name="district" placeholder="Contoh: Palu" required>
+
+        <label for="area">Area</label>
+        <input type="text" id="area" name="area" placeholder="Contoh: Birobuli">
+
+        <label for="alamat">Alamat</label>
+        <input type="text" id="alamat" name="alamat">
+
+        <label for="latitude">Latitude (opsional)</label>
+        <input type="text" id="latitude" name="latitude" placeholder="-0.8917">
+
+        <label for="longitude">Longitude (opsional)</label>
+        <input type="text" id="longitude" name="longitude" placeholder="119.8707">
+
+        <button type="submit">Tambah Lokasi</button>
+    </form>
+</div>
+
+</div>
+{% endblock %}
