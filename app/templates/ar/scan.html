@@ -1,40 +1,1011 @@
 {% extends "base.html" %}
-{% block title %}Scan QR{% endblock %}
+{% block title %}AR Scan & Panduan Slot{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h1>Scan QR Perangkat</h1>
-    <p class="subtitle">Arahkan kamera ke QR code yang tertempel di perangkat.</p>
+<style>
+    /* Full width wrapper for scan page */
+    .ar-container {
+        max-width: 680px;
+        margin: 0 auto;
+    }
 
-    <div id="reader" style="width:100%;"></div>
-    <p id="scan-status" class="subtitle" style="margin-top:14px;">Menyiapkan kamera&hellip;</p>
+    .scanner-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
 
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script>
-        const statusEl = document.getElementById("scan-status");
-        const scanner = new Html5Qrcode("reader");
+    #reader {
+        width: 100%;
+        max-width: 440px;
+        margin: 16px auto 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px dashed #cbd5e1;
+        background: #0f172a;
+    }
 
-        function onScanSuccess(decodedText) {
-            statusEl.textContent = "QR terbaca, mengarahkan...";
-            scanner.stop().then(() => {
-                window.location.href = decodedText;
-            });
+    /* Modal Backdrop and Box */
+    .ar-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .ar-modal-backdrop.is-active {
+        display: flex;
+    }
+
+    .ar-modal {
+        background: #ffffff;
+        width: 100%;
+        max-width: 720px;
+        max-height: 90vh;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(12px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .ar-modal__header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        background: #f8fafc;
+    }
+
+    .ar-modal__title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ar-modal__subtitle {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 4px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .badge-pill--primary {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-pill--location {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .ar-modal__close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
+        border-radius: 6px;
+        transition: all 0.15s;
+    }
+
+    .ar-modal__close:hover {
+        color: #0f172a;
+        background: #e2e8f0;
+    }
+
+    .ar-modal__body {
+        padding: 20px 24px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    /* Mode Toggle */
+    .search-mode-tabs {
+        display: flex;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 10px;
+        gap: 4px;
+        margin-bottom: 18px;
+    }
+
+    .mode-tab-btn {
+        flex: 1;
+        padding: 8px 14px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .mode-tab-btn.active {
+        background: #ffffff;
+        color: #1e3a8a;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Search input group */
+    .search-input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .search-btn {
+        padding: 10px 20px;
+        background: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background-color 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .search-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Result banners and cards */
+    .result-alert {
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .result-alert--error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+    }
+
+    .result-alert--warning {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        color: #92400e;
+    }
+
+    .result-alert--success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+    }
+
+    .result-card {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        background: #f8fafc;
+        margin-bottom: 20px;
+    }
+
+    .result-card__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+    }
+
+    .result-card__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        font-size: 0.88rem;
+    }
+
+    .result-item__label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    .result-item__value {
+        font-weight: 600;
+        color: #0f172a;
+        margin-top: 2px;
+    }
+
+    /* Slot Visualization Grid */
+    .slot-vis-section {
+        margin-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 18px;
+    }
+
+    .slot-vis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .slot-legend {
+        display: flex;
+        gap: 14px;
+        font-size: 0.78rem;
+        color: #475569;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .legend-dot--empty { background: #2c6e49; }
+    .legend-dot--occupied { background: #c0392b; }
+    .legend-dot--highlight { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+
+    .slot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+        gap: 8px;
+        max-height: 250px;
+        overflow-y: auto;
+        padding: 6px;
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .slot-card {
+        padding: 10px 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+        border: 2px solid transparent;
+        background: #ffffff;
+    }
+
+    .slot-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .slot-card--empty {
+        background: #e6f3ea;
+        border-color: #2c6e49;
+        color: #1e3a1e;
+    }
+
+    .slot-card--occupied {
+        background: #fbe9e7;
+        border-color: #c0392b;
+        color: #5c1810;
+    }
+
+    .slot-card--highlighted {
+        background: #fffbeb !important;
+        border-color: #f59e0b !important;
+        border-width: 3px !important;
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.75) !important;
+        animation: slotPulse 1.8s infinite;
+        transform: scale(1.04);
+        z-index: 2;
+    }
+
+    @keyframes slotPulse {
+        0% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+        50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.95); }
+        100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+    }
+
+    .slot-card__num {
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .slot-card__status {
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 4px;
+        text-transform: uppercase;
+    }
+
+    .slot-card__sn {
+        font-size: 0.72rem;
+        font-weight: 500;
+        margin-top: 2px;
+        word-break: break-all;
+    }
+
+    .slot-card__tag {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        background: #f59e0b;
+        color: #ffffff;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    /* Modal footer actions */
+    .ar-modal__footer {
+        padding: 14px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #334155;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e1;
+    }
+</style>
+
+<div class="ar-container">
+    <div class="scanner-card">
+        <h1 style="font-size:1.5rem; margin-top:0;">Scan QR Perangkat</h1>
+        <p class="subtitle" style="margin-bottom:12px;">
+            Arahkan kamera ke QR code yang terpasang di rak atau bodi perangkat (PSS24 / Metro).
+        </p>
+
+        <div id="reader"></div>
+
+        <p id="scan-status" class="subtitle" style="margin-top:14px; font-weight:500;">
+            Menyiapkan modul kamera...
+        </p>
+
+        <div style="margin-top: 16px; font-size: 0.85rem; color: #64748b;">
+            <a href="{{ url_for('ar.index') }}" style="color: var(--accent); text-decoration: none;">&larr; Kembali ke daftar perangkat</a>
+        </div>
+    </div>
+</div>
+
+<!-- POP-UP SEARCH & VISUALIZATION MODAL -->
+<div id="arSearchModal" class="ar-modal-backdrop" aria-hidden="true">
+    <div class="ar-modal" role="dialog" aria-modal="true" aria-labelledby="modalDeviceTitle">
+        <!-- Header -->
+        <div class="ar-modal__header">
+            <div>
+                <h2 id="modalDeviceTitle" class="ar-modal__title">
+                    <span>📡</span>
+                    <span id="devName">Memuat Perangkat...</span>
+                </h2>
+                <div class="ar-modal__subtitle">
+                    <span id="devType" class="badge-pill badge-pill--primary">-</span>
+                    <span id="devLocation" class="badge-pill badge-pill--location">📍 -</span>
+                    <span id="devSlotCount" class="badge-pill">0 Slot</span>
+                </div>
+            </div>
+            <button type="button" class="ar-modal__close" id="btnCloseModal" title="Tutup pop-up">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="ar-modal__body">
+            <!-- Mode Toggle Buttons -->
+            <div class="search-mode-tabs">
+                <button type="button" class="mode-tab-btn active" id="tabModeSn" onclick="setSearchMode('sn')">
+                    🏷️ Cari by Serial Number (SN)
+                </button>
+                <button type="button" class="mode-tab-btn" id="tabModeSlot" onclick="setSearchMode('slot')">
+                    📦 Cari by Nomor Slot
+                </button>
+            </div>
+
+            <!-- Search Input Box -->
+            <form id="arSearchForm" onsubmit="handleSearch(event)">
+                <div class="search-input-group">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Masukkan Serial Number modul..." 
+                        autocomplete="off"
+                        required
+                    />
+                    <button type="submit" class="search-btn" id="btnSubmitSearch">
+                        <span id="searchBtnIcon">🔍</span>
+                        <span id="searchBtnText">Cari</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Alert / Status Message Area -->
+            <div id="searchAlertArea"></div>
+
+            <!-- Detailed Search Result Card (if found) -->
+            <div id="searchResultCard" style="display: none;"></div>
+
+            <!-- Slot Visualization Section -->
+            <div class="slot-vis-section">
+                <div class="slot-vis-header">
+                    <strong style="font-size: 0.92rem; color: #1e293b;">
+                        Peta Susunan Slot (<span id="slotVisDevName">-</span>)
+                    </strong>
+                    <div class="slot-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dot--empty"></span>
+                            <span>Kosong</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dot--occupied"></span>
+                            <span>Terisi</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dot--highlight"></span>
+                            <span>Hasil Pencarian</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slot Grid Cards Container -->
+                <div id="slotGridContainer" class="slot-grid">
+                    <div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 20px;">
+                        Memuat data slot perangkat...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ar-modal__footer">
+            <button type="button" class="btn-secondary" id="btnResetSearch" onclick="resetSearchForm()">
+                🔄 Cari Ulang di Perangkat Ini
+            </button>
+            <button type="button" class="btn-secondary" id="btnScanAnother" onclick="scanAnotherDevice()">
+                📷 Pindai Perangkat Lain
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    // State management
+    let currentDeviceId = null;
+    let currentDeviceData = null;
+    let deviceSlotsData = [];
+    let currentSearchMode = "sn"; // 'sn' or 'slot'
+    let currentHighlightedSlotId = null;
+    let scannerInstance = null;
+    let isScannerRunning = false;
+
+    const statusEl = document.getElementById("scan-status");
+    const modalEl = document.getElementById("arSearchModal");
+    const searchInput = document.getElementById("searchInput");
+    const searchAlertArea = document.getElementById("searchAlertArea");
+    const searchResultCard = document.getElementById("searchResultCard");
+    const slotGridContainer = document.getElementById("slotGridContainer");
+
+    // Close modal listener
+    document.getElementById("btnCloseModal").addEventListener("click", () => {
+        closeModal();
+    });
+
+    // Helper: Parse device_id from URL or QR text
+    function extractDeviceId(text) {
+        if (!text) return null;
+        try {
+            // Case 1: Check query parameter `device_id=`
+            const urlObj = new URL(text, window.location.origin);
+            const devIdParam = urlObj.searchParams.get("device_id");
+            if (devIdParam && !isNaN(parseInt(devIdParam, 10))) {
+                return parseInt(devIdParam, 10);
+            }
+
+            // Case 2: Check path `/ar/device/<id>`
+            const matchPath = urlObj.pathname.match(/\/ar\/device\/(\d+)/);
+            if (matchPath) {
+                return parseInt(matchPath[1], 10);
+            }
+        } catch (e) {
+            // Not a full URL string, try regex directly on text
         }
+
+        const matchParam = text.match(/[?&]device_id=(\d+)/);
+        if (matchParam) return parseInt(matchParam[1], 10);
+
+        const matchDevicePath = text.match(/\/ar\/device\/(\d+)/);
+        if (matchDevicePath) return parseInt(matchDevicePath[1], 10);
+
+        if (!isNaN(parseInt(text, 10))) {
+            return parseInt(text, 10);
+        }
+
+        return null;
+    }
+
+    // Initialize on page load: check if device_id is already in query params
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const deviceIdFromUrl = urlParams.get("device_id");
+
+        if (deviceIdFromUrl && !isNaN(parseInt(deviceIdFromUrl, 10))) {
+            // Device ID is provided in URL directly
+            statusEl.textContent = "Konteks perangkat terdeteksi dari QR. Menampilkan panel pencarian...";
+            openDeviceContext(parseInt(deviceIdFromUrl, 10));
+        } else {
+            // No device_id yet, start QR camera scanner
+            startQrScanner();
+        }
+    });
+
+    // Start Camera Scanner
+    function startQrScanner() {
+        if (isScannerRunning) return;
+
+        scannerInstance = new Html5Qrcode("reader");
+        statusEl.textContent = "Menghubungkan ke kamera...";
 
         Html5Qrcode.getCameras().then(cameras => {
             if (cameras && cameras.length) {
+                // Select rear camera if available
                 const cameraId = cameras[cameras.length - 1].id;
-                scanner.start(
+                scannerInstance.start(
                     cameraId,
-                    { fps: 10, qrbox: 250 },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
                     onScanSuccess
-                );
-                statusEl.textContent = "Arahkan kamera ke QR code.";
+                ).then(() => {
+                    isScannerRunning = true;
+                    statusEl.textContent = "Arahkan kamera ke QR code pada rak/perangkat.";
+                }).catch(err => {
+                    statusEl.textContent = "Gagal menyalakan kamera: " + err;
+                });
             } else {
                 statusEl.textContent = "Kamera tidak ditemukan di perangkat ini.";
             }
         }).catch(err => {
-            statusEl.textContent = "Gagal akses kamera: " + err;
+            statusEl.textContent = "Izin kamera diperlukan: " + err;
         });
-    </script>
-</div>
+    }
+
+    // Stop Camera Scanner
+    function stopQrScanner() {
+        if (scannerInstance && isScannerRunning) {
+            scannerInstance.stop().then(() => {
+                isScannerRunning = false;
+            }).catch(e => console.warn("Stop scanner error:", e));
+        }
+    }
+
+    // Callback when QR is decoded
+    function onScanSuccess(decodedText) {
+        statusEl.textContent = "QR Code terdeteksi! Mengidentifikasi perangkat...";
+        const devId = extractDeviceId(decodedText);
+
+        if (devId) {
+            stopQrScanner();
+            // Update URL without page reload so refresh keeps device context
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set("device_id", devId);
+            window.history.replaceState({}, "", newUrl);
+
+            openDeviceContext(devId);
+        } else {
+            statusEl.innerHTML = `<span style="color:#dc2626;">QR Code terbaca tetapi tidak berisi identitas perangkat yang valid.</span>`;
+        }
+    }
+
+    // Open Modal and load device details & slots
+    async function openDeviceContext(deviceId) {
+        currentDeviceId = deviceId;
+        currentHighlightedSlotId = null;
+        modalEl.classList.add("is-active");
+        modalEl.setAttribute("aria-hidden", "false");
+
+        // Reset views
+        searchAlertArea.innerHTML = "";
+        searchResultCard.style.display = "none";
+        searchInput.value = "";
+
+        // Fetch device metadata
+        try {
+            const devRes = await fetch(`/ar/api/device/${deviceId}`);
+            if (!devRes.ok) throw new Error("Gagal mengambil data perangkat.");
+            currentDeviceData = await devRes.json();
+
+            document.getElementById("devName").textContent = currentDeviceData.nama_perangkat;
+            document.getElementById("slotVisDevName").textContent = currentDeviceData.nama_perangkat;
+            document.getElementById("devType").textContent = currentDeviceData.tipe;
+            document.getElementById("devLocation").textContent = "📍 " + currentDeviceData.lokasi;
+            document.getElementById("devSlotCount").textContent = currentDeviceData.total_slot + " Slot";
+        } catch (err) {
+            document.getElementById("devName").textContent = "Perangkat #" + deviceId;
+            searchAlertArea.innerHTML = `<div class="result-alert result-alert--error">⚠️ ${err.message}</div>`;
+        }
+
+        // Fetch slot list
+        await loadDeviceSlots(deviceId);
+        searchInput.focus();
+    }
+
+    // Load slots for visualization grid
+    async function loadDeviceSlots(deviceId) {
+        try {
+            const res = await fetch(`/ar/api/device/${deviceId}/slots`);
+            if (!res.ok) throw new Error("Gagal mengambil visualisasi slot.");
+            const data = await res.json();
+            deviceSlotsData = data.slots || [];
+            renderSlotGrid(currentHighlightedSlotId);
+        } catch (err) {
+            slotGridContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#dc2626; padding:12px;">Gagal memuat slot: ${err.message}</div>`;
+        }
+    }
+
+    // Render slot cards with highlight
+    function renderSlotGrid(highlightedSlotId) {
+        if (!deviceSlotsData || !deviceSlotsData.length) {
+            slotGridContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:20px;">Tidak ada definisi slot untuk tipe perangkat ini.</div>`;
+            return;
+        }
+
+        let html = "";
+        let highlightedElementId = null;
+
+        deviceSlotsData.forEach(slot => {
+            const isHighlighted = (highlightedSlotId && slot.slot_definition_id === highlightedSlotId);
+            const isOccupied = slot.occupied;
+            const elementId = `slot-card-${slot.slot_definition_id}`;
+
+            let cardClass = "slot-card";
+            if (isOccupied) {
+                cardClass += " slot-card--occupied";
+            } else {
+                cardClass += " slot-card--empty";
+            }
+
+            if (isHighlighted) {
+                cardClass += " slot-card--highlighted";
+                highlightedElementId = elementId;
+            }
+
+            html += `
+                <div id="${elementId}" class="${cardClass}" onclick="inspectSlotDirectly('${slot.nomor_slot}')" title="Klik untuk cek slot ini">
+                    <div class="slot-card__num">Slot ${slot.nomor_slot}</div>
+                    <div class="slot-card__status" style="color: ${isOccupied ? '#991b1b' : '#166534'}">
+                        ${isOccupied ? '🔴 Terisi' : '🟢 Kosong'}
+                    </div>
+                    ${isOccupied && slot.module ? `<div class="slot-card__sn">${slot.module.serial_number}</div>` : ''}
+                    ${isHighlighted ? `<div class="slot-card__tag">⭐ TERPILIH</div>` : ''}
+                </div>
+            `;
+        });
+
+        slotGridContainer.innerHTML = html;
+
+        // Auto-scroll highlighted slot into visible viewport
+        if (highlightedElementId) {
+            setTimeout(() => {
+                const targetEl = document.getElementById(highlightedElementId);
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        }
+    }
+
+    // Switch Search Mode (SN vs Slot)
+    function setSearchMode(mode) {
+        currentSearchMode = mode;
+        const tabSn = document.getElementById("tabModeSn");
+        const tabSlot = document.getElementById("tabModeSlot");
+
+        if (mode === "sn") {
+            tabSn.classList.add("active");
+            tabSlot.classList.remove("active");
+            searchInput.placeholder = "Masukkan Serial Number modul (cth: CFP2-001, SN-...)";
+        } else {
+            tabSlot.classList.add("active");
+            tabSn.classList.remove("active");
+            searchInput.placeholder = "Masukkan nomor slot perangkat (cth: 1, 2, 5...)";
+        }
+        searchInput.focus();
+    }
+
+    // Click on a slot card directly triggers slot search
+    function inspectSlotDirectly(slotNumber) {
+        setSearchMode('slot');
+        searchInput.value = slotNumber;
+        handleSearch();
+    }
+
+    // Execute Search against backend API
+    async function handleSearch(event) {
+        if (event) event.preventDefault();
+        const query = searchInput.value.trim();
+        if (!query || !currentDeviceId) return;
+
+        const submitBtn = document.getElementById("btnSubmitSearch");
+        const btnIcon = document.getElementById("searchBtnIcon");
+        const btnText = document.getElementById("searchBtnText");
+
+        // UI Loading state
+        submitBtn.disabled = true;
+        btnIcon.textContent = "⏳";
+        btnText.textContent = "Mencari...";
+        searchAlertArea.innerHTML = "";
+        searchResultCard.style.display = "none";
+
+        try {
+            const url = `/ar/api/search?device_id=${encodeURIComponent(currentDeviceId)}&type=${encodeURIComponent(currentSearchMode)}&q=${encodeURIComponent(query)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (!result.found) {
+                // Not found scenarios
+                currentHighlightedSlotId = null;
+                renderSlotGrid(null);
+
+                if (result.reason === "wrong_device") {
+                    searchAlertArea.innerHTML = `
+                        <div class="result-alert result-alert--warning">
+                            <span style="font-size:1.2rem;">⚠️</span>
+                            <div>
+                                <strong>Modul Tidak Berada di Perangkat Ini</strong>
+                                <div style="margin-top:2px;">${result.message}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (result.reason === "not_installed") {
+                    searchAlertArea.innerHTML = `
+                        <div class="result-alert result-alert--warning">
+                            <span style="font-size:1.2rem;">📦</span>
+                            <div>
+                                <strong>Modul Berstatus Bebas / Belum Dipasang</strong>
+                                <div style="margin-top:2px;">${result.message}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    searchAlertArea.innerHTML = `
+                        <div class="result-alert result-alert--error">
+                            <span style="font-size:1.2rem;">❌</span>
+                            <div>
+                                <strong>Pencarian Tidak Ditemukan</strong>
+                                <div style="margin-top:2px;">${result.message || "Data tidak ditemukan."}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // Result FOUND!
+                currentHighlightedSlotId = result.highlight_slot_id;
+
+                // Re-render visual grid with pulse highlight on the target slot!
+                renderSlotGrid(currentHighlightedSlotId);
+
+                // Render result card details
+                renderResultDetails(result);
+            }
+        } catch (err) {
+            searchAlertArea.innerHTML = `
+                <div class="result-alert result-alert--error">
+                    <span style="font-size:1.2rem;">⚠️</span>
+                    <div>
+                        <strong>Terjadi Kesalahan Jaringan</strong>
+                        <div style="margin-top:2px;">${err.message}</div>
+                    </div>
+                </div>
+            `;
+        } finally {
+            submitBtn.disabled = false;
+            btnIcon.textContent = "🔍";
+            btnText.textContent = "Cari";
+        }
+    }
+
+    // Render Result Card HTML
+    function renderResultDetails(data) {
+        searchResultCard.style.display = "block";
+
+        if (data.type === "sn") {
+            searchResultCard.innerHTML = `
+                <div class="result-card">
+                    <div class="result-card__header">
+                        <div>
+                            <span class="badge-pill badge-pill--primary" style="font-size:0.8rem;">Modul Ditemukan</span>
+                            <h3 style="margin:4px 0 0 0; font-size:1.1rem; color:#0f172a;">${data.module.serial_number}</h3>
+                        </div>
+                        <span class="badge-pill" style="background:#dcfce7; color:#15803d; font-weight:700;">
+                            ${data.module.kondisi}
+                        </span>
+                    </div>
+                    <div class="result-card__grid">
+                        <div>
+                            <div class="result-item__label">Tipe Modul</div>
+                            <div class="result-item__value">${data.module.tipe}</div>
+                        </div>
+                        <div>
+                            <div class="result-item__label">Nomor Slot Terpasang</div>
+                            <div class="result-item__value" style="color:#d97706; font-size:1.05rem;">
+                                ⭐ Slot ${data.slot.nomor_slot}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="result-item__label">Nama Slot</div>
+                            <div class="result-item__value">${data.slot.nama_slot}</div>
+                        </div>
+                        <div>
+                            <div class="result-item__label">Perangkat & Lokasi</div>
+                            <div class="result-item__value">${data.device.nama_perangkat} (${data.device.lokasi})</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (data.type === "slot") {
+            const isOccupied = data.slot.status === "TERISI";
+            searchResultCard.innerHTML = `
+                <div class="result-card">
+                    <div class="result-card__header">
+                        <div>
+                            <span class="badge-pill badge-pill--primary" style="font-size:0.8rem;">Spesifikasi Slot</span>
+                            <h3 style="margin:4px 0 0 0; font-size:1.1rem; color:#0f172a;">
+                                ⭐ Slot ${data.slot.nomor_slot} &mdash; ${data.slot.nama_slot}
+                            </h3>
+                        </div>
+                        <span class="badge-pill" style="background:${isOccupied ? '#fee2e2' : '#dcfce7'}; color:${isOccupied ? '#991b1b' : '#15803d'}; font-weight:700;">
+                            ${isOccupied ? '🔴 TERISI' : '🟢 KOSONG — SIAP DIPASANG'}
+                        </span>
+                    </div>
+                    <div class="result-card__grid">
+                        <div>
+                            <div class="result-item__label">Posisi Rak</div>
+                            <div class="result-item__value">${data.slot.posisi}</div>
+                        </div>
+                        <div>
+                            <div class="result-item__label">Modul Terpasang</div>
+                            <div class="result-item__value" style="font-weight:700; color:${isOccupied ? '#0f172a' : '#64748b'};">
+                                ${isOccupied ? data.module.serial_number : 'Tidak Ada Modul'}
+                            </div>
+                        </div>
+                        ${isOccupied ? `
+                            <div>
+                                <div class="result-item__label">Tipe Modul</div>
+                                <div class="result-item__value">${data.module.tipe}</div>
+                            </div>
+                            <div>
+                                <div class="result-item__label">Kondisi Modul</div>
+                                <div class="result-item__value">${data.module.kondisi}</div>
+                            </div>
+                        ` : `
+                            <div>
+                                <div class="result-item__label">Rekomendasi</div>
+                                <div class="result-item__value" style="color:#15803d;">Slot tersedia untuk penambahan/pemasangan modul baru</div>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Reset search inside the same device modal
+    function resetSearchForm() {
+        searchInput.value = "";
+        searchAlertArea.innerHTML = "";
+        searchResultCard.style.display = "none";
+        currentHighlightedSlotId = null;
+        renderSlotGrid(null);
+        searchInput.focus();
+    }
+
+    // Close modal
+    function closeModal() {
+        modalEl.classList.remove("is-active");
+        modalEl.setAttribute("aria-hidden", "true");
+        statusEl.textContent = "Pop-up ditutup. Siap untuk scan QR perangkat.";
+        startQrScanner();
+    }
+
+    // Scan another device: resets URL and reactivates camera
+    function scanAnotherDevice() {
+        modalEl.classList.remove("is-active");
+        modalEl.setAttribute("aria-hidden", "true");
+        currentDeviceId = null;
+        currentDeviceData = null;
+        deviceSlotsData = [];
+        currentHighlightedSlotId = null;
+
+        // Clear query parameter from URL
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.delete("device_id");
+        window.history.replaceState({}, "", newUrl);
+
+        statusEl.textContent = "Menyiapkan kamera untuk perangkat baru...";
+        startQrScanner();
+    }
+</script>
 {% endblock %}

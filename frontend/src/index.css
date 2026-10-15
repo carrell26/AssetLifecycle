@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-page: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --border-card: #E2E8F0;
+    --border-subtle: #F1F5F9;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --brand-primary: #EE2E24;
+    --brand-primary-hover: #D31F17;
+    --brand-secondary: #DC2626;
+    --accent-glow: rgba(238, 46, 36, 0.15);
+  }
+
+  html.dark {
+    --bg-page: #071426;
+    --bg-card: #0D1F36;
+    --border-card: #1E3A5F;
+    --border-subtle: #1A2E4C;
+    --text-primary: #E6EDF7;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --brand-primary: #1677FF;
+    --brand-primary-hover: #0958d9;
+    --brand-secondary: #38BDF8;
+    --accent-glow: rgba(22, 119, 255, 0.25);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1E3A5F;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.15); }
+}
+
+.pulse-glow {
+  animation: pulse-slow 2.4s ease-in-out infinite;
+}
+
+.donut-slice {
+  transition: stroke-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
+}
+
+.donut-slice:hover {
+  stroke-width: 17;
+  opacity: 0.95;
+}
+
+/* ============================================================
+   DARK INPUT AUTOFILL & CUSTOM CHECKBOX (MENCEGAH KOTAK PUTIH)
+   ============================================================ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0D1F36 inset !important;
+  -webkit-text-fill-color: #E6EDF7 !important;
+  caret-color: #E6EDF7 !important;
+  border-color: #162B48 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Custom Checkbox Dark */
+.login-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #0D1F36;
+  border: 1.5px solid #1E3A5F;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.login-checkbox:hover {
+  border-color: #1677FF;
+  box-shadow: 0 0 8px rgba(22, 119, 255, 0.25);
+}
+
+.login-checkbox:checked {
+  background-color: #1677FF;
+  border-color: #1677FF;
+}
+
+.login-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+.login-checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.35);
+}
+

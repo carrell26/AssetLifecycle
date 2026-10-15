@@ -14,14 +14,17 @@
 
 <div class="card">
     <table>
-        <thead><tr><th>Nama Perangkat</th><th>Lokasi</th><th>QR Code</th><th>Panduan</th></tr></thead>
+        <thead><tr><th>Nama Perangkat</th><th>Lokasi</th><th>QR Code</th><th>Aksi</th></tr></thead>
         <tbody>
             {% for d in devices %}
             <tr>
                 <td>{{ d.nama_perangkat }}</td>
                 <td>{{ d.location.nama_lokasi if d.location else "-" }}</td>
                 <td><a href="{{ url_for('ar.device_qr', device_id=d.device_id) }}" target="_blank">Lihat QR</a></td>
-                <td><a href="{{ url_for('ar.device_guide', device_id=d.device_id) }}">Buka panduan</a></td>
+                <td>
+                    <a href="{{ url_for('ar.scan', device_id=d.device_id) }}" style="font-weight:600; margin-right:8px;">Buka Panel AR</a> &middot;
+                    <a href="{{ url_for('ar.device_guide', device_id=d.device_id) }}" style="color:var(--ink-soft);">Panduan Statis</a>
+                </td>
             </tr>
             {% else %}
             <tr><td colspan="4">Belum ada perangkat.</td></tr>

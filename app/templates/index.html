@@ -92,42 +92,136 @@
     </div>
     <!-- Navigation -->
     <nav class="flex flex-col gap-1 px-3 pt-6 pb-3">
-      <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="#dashboard">
-        <span class="material-symbols-outlined text-[19px]">dashboard</span>
-        <span class="">Dashboard</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#perangkat">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
-        <span class="">Perangkat</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#modul">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
-        <span class="">Modul</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#lokasi">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
-        <span class="">Lokasi</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#pengajuan">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-        <span class="">Pengajuan Modul</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#daftarkan-teknisi">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">person_add</span>
-        <span class="">Daftarkan Teknisi</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#import">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
-        <span class="">Import Data</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#export">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
-        <span class="">Export Data</span>
-      </a>
-      <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="#audit">
-        <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
-        <span class="">Audit Log</span>
-      </a>
+      {% if current_user.role == 'teknisi' %}
+        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
+          <span class="material-symbols-outlined text-[19px]">dashboard</span>
+          <span class="">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span class="">Pengajuan Perpindahan</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span class="">AR/VR</span>
+        </a>
+      {% elif current_user.role == 'karyawan_tif' and current_user.is_pj %}
+        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
+          <span class="material-symbols-outlined text-[19px]">dashboard</span>
+          <span class="">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_devices') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span class="">Perangkat</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_locations') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span class="">Lokasi</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span class="">Pengajuan Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.register_teknisi') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">person_add</span>
+          <span class="">Daftarkan Teknisi</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span class="">Import Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('export.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span class="">Export Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.list_logs') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span class="">Audit Log</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span class="">AR/VR</span>
+        </a>
+      {% elif current_user.role == 'karyawan_tif' and not current_user.is_pj %}
+        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
+          <span class="material-symbols-outlined text-[19px]">dashboard</span>
+          <span class="">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_devices') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span class="">Perangkat</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_locations') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span class="">Lokasi</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span class="">Pengajuan Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span class="">Import Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('export.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span class="">Export Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.list_logs') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span class="">Audit Log</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span class="">AR/VR</span>
+        </a>
+      {% else %}
+        <!-- Admin -->
+        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
+          <span class="material-symbols-outlined text-[19px]">dashboard</span>
+          <span class="">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_devices') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span class="">Perangkat</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_device_types') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span class="">Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_locations') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span class="">Lokasi</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span class="">Pengajuan Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.manage_users') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">manage_accounts</span>
+          <span class="">Kelola User</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.register_karyawan') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">badge</span>
+          <span class="">Daftarkan Karyawan</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span class="">Import Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('export.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span class="">Export Data</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.list_logs') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span class="">Audit Log</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span class="">AR/VR</span>
+        </a>
+      {% endif %}
     </nav>
   </div>
 </aside>

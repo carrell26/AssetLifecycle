@@ -1,22 +1,497 @@
-{% extends "base.html" %}
-{% block title %}Masuk{% endblock %}
-{% block content %}
-<div class="card">
-    <h1>Masuk</h1>
-    <p class="subtitle">Masuk untuk mencatat dan melacak riwayat aset perangkat.</p>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masuk · Asset Lifecycle Telkom Infrastructure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <form method="POST">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autofocus>
+    html, body {
+      height: 100%;
+    }
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #050e1a;
+      color: #E6EDF7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        <button type="submit">Masuk</button>
-    </form>
+    .login-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #050e1a;
+    }
 
-    <p class="form-footer">
-        Teknisi belum punya akun? <a href="{{ url_for('auth.register') }}">Daftar di sini</a>.
-    </p>
-</div>
-{% endblock %}
+    .login-card {
+      display: flex;
+      width: 100%;
+      max-width: 960px;
+      min-height: 520px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(22, 119, 255, 0.35);
+      box-shadow: 0 0 0 1px rgba(22,119,255,0.12), 0 32px 64px rgba(0,0,0,0.55);
+      background: #071426;
+    }
+
+    /* ── LEFT PANEL ── */
+    .login-left {
+      flex: 1;
+      padding: 52px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #071426;
+      min-width: 0;
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .login-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1677FF, #0a4aa3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(22,119,255,0.45);
+      flex-shrink: 0;
+    }
+
+    .login-logo-icon .material-symbols-outlined {
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .login-logo-text h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #E6EDF7;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .login-logo-text span {
+      font-size: 9px;
+      font-weight: 500;
+      color: #38BDF8;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .login-heading {
+      font-size: 26px;
+      font-weight: 700;
+      color: #E6EDF7;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .login-subtext {
+      font-size: 13px;
+      color: #64748B;
+      margin-bottom: 28px;
+    }
+
+    /* ── Flash messages (only error) ── */
+    .flash-stack {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .flash {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .flash--error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #FCA5A5;
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #94A3B8;
+      margin-bottom: 7px;
+    }
+
+    .form-input-wrap {
+      position: relative;
+    }
+
+    .form-input-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #3B526B;
+      font-size: 18px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 42px;
+      background: #0D1F36 !important;
+      border: 1px solid #162B48;
+      border-radius: 10px;
+      padding: 0 42px 0 40px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: #E6EDF7 !important;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      -webkit-text-fill-color: #E6EDF7 !important;
+    }
+
+    .form-input::placeholder {
+      color: #3B526B;
+      -webkit-text-fill-color: #3B526B !important;
+    }
+
+    .form-input:hover {
+      border-color: #203A5F;
+    }
+
+    .form-input:focus {
+      border-color: #1677FF;
+      box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.25);
+    }
+
+    /* Fix browser autofill white background */
+    .form-input:-webkit-autofill,
+    .form-input:-webkit-autofill:hover,
+    .form-input:-webkit-autofill:focus,
+    .form-input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 60px #0D1F36 inset !important;
+      -webkit-text-fill-color: #E6EDF7 !important;
+      transition: background-color 9999s ease-in-out 0s;
+      border-color: #162B48 !important;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #3B526B;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .toggle-pw:hover { color: #94A3B8; }
+
+    .toggle-pw .material-symbols-outlined { font-size: 18px; }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      margin-top: 6px;
+    }
+
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+    }
+
+    .checkbox-wrap input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #1677FF;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checkbox-wrap span {
+      font-size: 12px;
+      color: #64748B;
+    }
+
+    .forgot-link {
+      font-size: 12px;
+      color: #1677FF;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .forgot-link:hover {
+      color: #38BDF8;
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      height: 42px;
+      background: #1677FF;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 4px 18px rgba(22,119,255,0.4);
+      letter-spacing: 0.01em;
+    }
+
+    .btn-login:hover {
+      background: #1565e0;
+      box-shadow: 0 6px 22px rgba(22,119,255,0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-login:active { transform: translateY(0); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 14px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1A2E4C;
+    }
+
+    .divider span {
+      font-size: 11px;
+      color: #3B526B;
+      font-weight: 500;
+    }
+
+    .login-footer {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .login-footer p {
+      font-size: 12px;
+      color: #3B526B;
+      line-height: 1.6;
+    }
+
+    .login-footer a {
+      color: #1677FF;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-footer a:hover {
+      color: #38BDF8;
+      text-decoration: underline;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .login-right {
+      width: 46%;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    /* Left-side gradient blend into form panel */
+    .login-right-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, #071426 0%, rgba(7,20,38,0.3) 25%, transparent 60%);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      .login-right { display: none; }
+      .login-left { padding: 40px 28px; }
+      .login-card { max-width: 440px; }
+    }
+
+    @media (max-width: 420px) {
+      .login-left { padding: 32px 20px; }
+      .login-heading { font-size: 22px; }
+      .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <!-- LEFT: Form -->
+      <div class="login-left">
+
+        <!-- Logo -->
+        <div class="login-logo">
+          <div class="login-logo-icon">
+            <span class="material-symbols-outlined">hub</span>
+          </div>
+          <div class="login-logo-text">
+            <h2>Asset Lifecycle</h2>
+            <span>Telkom Infrastructure</span>
+          </div>
+        </div>
+
+        <!-- Heading -->
+        <h1 class="login-heading">Selamat datang kembali</h1>
+        <p class="login-subtext">Masuk untuk mengelola aset jaringan</p>
+
+        <!-- Flash Messages: only show errors -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% set error_msgs = messages | selectattr('0', 'equalto', 'error') | list %}
+          {% if error_msgs %}
+            <div class="flash-stack">
+              {% for category, message in error_msgs %}
+                <div class="flash flash--error">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Form -->
+        <form method="POST" autocomplete="on">
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <div class="form-input-wrap">
+              <span class="material-symbols-outlined form-input-icon">mail</span>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="Masukkan email"
+                required
+                autofocus
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="form-input-wrap">
+              <span class="material-symbols-outlined form-input-icon">lock</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="Masukkan password"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Tampilkan password">
+                <span class="material-symbols-outlined" id="toggleIcon">visibility_off</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember + Forgot -->
+          <div class="form-row">
+            <label class="checkbox-wrap">
+              <input type="checkbox" name="remember" id="remember" />
+              <span>Ingat saya</span>
+            </label>
+            <a href="#" class="forgot-link">Lupa password?</a>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-login">Masuk</button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider"><span>atau</span></div>
+
+        <!-- Footer links -->
+        <div class="login-footer">
+          <p>Butuh bantuan? <a href="mailto:admin@telkom.co.id">Hubungi admin sistem</a></p>
+          <p>Belum punya akun? <a href="{{ url_for('auth.register') }}">Daftar</a></p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Image (dark server corridor HD) -->
+      <div class="login-right">
+        <img
+          src="/static/img/login_bg.png"
+          alt="Ruang server Telkom"
+        />
+        <div class="login-right-overlay"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const pw = document.getElementById('password');
+      const icon = document.getElementById('toggleIcon');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.textContent = 'visibility';
+      } else {
+        pw.type = 'password';
+        icon.textContent = 'visibility_off';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -13,6 +13,8 @@ def create_app():
     migrate.init_app(app, db)
 
     from . import models  # noqa: F401
+    with app.app_context():
+        db.create_all()
 
     from flask_login import LoginManager
 
@@ -36,6 +38,7 @@ def create_app():
     from .modules.audit import audit_bp
     from .modules.export import export_bp
     from .modules.ar import ar_bp
+    from .modules.api import api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(device_bp)
@@ -44,6 +47,7 @@ def create_app():
     app.register_blueprint(audit_bp)
     app.register_blueprint(export_bp)
     app.register_blueprint(ar_bp)
+    app.register_blueprint(api_bp)
 
     # ==========================================
     # CLI: CREATE ADMIN
@@ -122,6 +126,11 @@ def create_app():
         # Redirect ke login jika belum authenticated
         if not current_user.is_authenticated:
             return redirect(url_for("auth.login"))
+
+        import os
+        react_template_path = os.path.join(app.root_path, "templates", "react_index.html")
+        if os.path.exists(react_template_path):
+            return render_template("react_index.html", current_user=current_user)
 
         # ==========================================
         # KPI METRICS

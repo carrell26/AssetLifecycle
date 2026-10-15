@@ -15,6 +15,7 @@ class User(db.Model, UserMixin):
     is_pj = db.Column(db.Boolean, default=False)
     district = db.Column(db.String(100))
     status = db.Column(db.String(20), default="aktif")  # 'aktif' / 'pending'
+    avatar_path = db.Column(db.String(255), nullable=True)  # path relatif ke static/avatars/
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -27,3 +28,9 @@ class User(db.Model, UserMixin):
     def get_id(self):
         # Diperlukan Flask-Login: primary key kita bernama user_id, bukan id
         return str(self.user_id)
+
+    def get_avatar_url(self):
+        """Return URL avatar, fallback ke None jika belum ada."""
+        if self.avatar_path:
+            return f"/static/avatars/{self.avatar_path}"
+        return None

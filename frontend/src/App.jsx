@@ -1,0 +1,163 @@
+import React, { useState, useEffect } from "react";
+import { useTheme } from "./context/ThemeContext";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+import HeroBanner from "./components/HeroBanner";
+import KpiCards from "./components/KpiCards";
+import DeviceDistributionChart from "./components/DeviceDistributionChart";
+import ModuleConditionChart from "./components/ModuleConditionChart";
+import MovementTrendChart from "./components/MovementTrendChart";
+import RecentActivities from "./components/RecentActivities";
+import TeknisiKpiCards from "./components/TeknisiKpiCards";
+import TeknisiRecentRequests from "./components/TeknisiRecentRequests";
+import AvatarModal from "./components/AvatarModal";
+import LogoutModal from "./components/LogoutModal";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+
+export default function App() {
+  // Simple client-side routing based on pathname
+  const path = window.location.pathname;
+  if (path === "/auth/login" || path === "/auth/login/") {
+    return <LoginPage />;
+  }
+  if (path === "/auth/register" || path === "/auth/register/") {
+    return <RegisterPage />;
+  }
+
+  const { isDark } = useTheme();
+  const [user, setUser] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [period, setPeriod] = useState("30d");
+  const [loading, setLoading] = useState(true);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+
+  // Fetch User Profile
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/me");
+      if (res.status === 401) {
+        window.location.href = "/auth/login";
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error("Failed to load user profile:", err);
+    }
+  };
+
+  // Fetch Dashboard Stats
+  const fetchStats = async (p = period) => {
+    try {
+      const res = await fetch(`/api/dashboard/stats?period=${p}`);
+      if (res.status === 401) {
+        window.location.href = "/auth/login";
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setStats(data);
+      }
+    } catch (err) {
+      console.error("Failed to load dashboard stats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+    fetchStats("30d");
+  }, []);
+
+  const handlePeriodChange = (newPeriod) => {
+    setPeriod(newPeriod);
+    fetchStats(newPeriod);
+  };
+
+  const handleAvatarUpdated = (newAvatarUrl) => {
+    setUser((prev) => (prev ? { ...prev, avatar_url: newAvatarUrl } : prev));
+  };
+
+  const isTeknisi = user?.role === "teknisi";
+
+  return (
+    <div
+      className={`min-h-screen w-full transition-colors duration-300 ${
+        isDark ? "bg-[#071426] text-[#E6EDF7]" : "bg-slate-50 text-slate-900"
+      }`}
+    >
+      {/* Sidebar with role-specific menu filtering */}
+      <Sidebar user={user} />
+
+      {/* Main Layout Area */}
+      <div className="pl-[240px] flex flex-col min-h-screen w-full">
+        {/* Top Header with Theme Switcher & Profile */}
+        <Header
+          user={user}
+          onOpenLogoutModal={() => setLogoutModalOpen(true)}
+          onOpenAvatarModal={() => setAvatarModalOpen(true)}
+        />
+
+        {/* Dashboard Main Content */}
+        <main className="mt-[64px] p-6 space-y-5 flex-1 w-full max-w-7xl">
+          {/* Welcome Banner */}
+          <HeroBanner userName={user?.name} userRole={user?.role} />
+
+          {isTeknisi ? (
+            /* ======================================================== */
+            /* DASHBOARD TEKNISI (Sesuai Gambar Referensi & Arahan User) */
+            /* ======================================================== */
+            <>
+              {/* 4 Kartu Metrik Khusus Teknisi */}
+              <TeknisiKpiCards data={stats?.teknisi} />
+
+              {/* Riwayat Pengajuan Terbaru (Gaya Aktivitas Terbaru) */}
+              <TeknisiRecentRequests requests={stats?.teknisi?.recent_requests} />
+            </>
+          ) : (
+            /* ======================================================== */
+            /* DASHBOARD ADMIN & KARYAWAN TIF (Tetap Konsisten)         */
+            /* ======================================================== */
+            <>
+              {/* KPI Metrics Cards */}
+              <KpiCards kpi={stats?.kpi} />
+
+              {/* Donut Charts */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <DeviceDistributionChart data={stats?.device_distribution} />
+                <ModuleConditionChart data={stats?.module_conditions} />
+              </div>
+
+              {/* Trend Line Chart */}
+              <MovementTrendChart
+                data={stats?.movement_trend}
+                currentPeriod={period}
+                onPeriodChange={handlePeriodChange}
+              />
+
+              {/* Activity Log */}
+              <RecentActivities activities={stats?.recent_activities} />
+            </>
+          )}
+        </main>
+      </div>
+
+      {/* Modals */}
+      <AvatarModal
+        isOpen={avatarModalOpen}
+        onClose={() => setAvatarModalOpen(false)}
+        onAvatarUpdated={handleAvatarUpdated}
+      />
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+        user={user}
+      />
+    </div>
+  );
+}
