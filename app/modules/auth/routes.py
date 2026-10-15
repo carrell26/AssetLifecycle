@@ -225,6 +225,7 @@ def register_teknisi():
 @role_required("admin")
 def register_karyawan():
     """Admin daftarkan akun Karyawan TIF baru (FR-1.3)."""
+    from datetime import datetime, timezone
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip()
@@ -233,11 +234,13 @@ def register_karyawan():
 
         if not name or not email or not password or not district:
             flash("Semua kolom wajib diisi.", "error")
-            return render_template("auth/register_karyawan.html")
+            recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
+            return render_template("auth/register_karyawan.html", recent_users=recent_users)
 
         if User.query.filter_by(email=email).first():
             flash("Email sudah terdaftar.", "error")
-            return render_template("auth/register_karyawan.html")
+            recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
+            return render_template("auth/register_karyawan.html", recent_users=recent_users)
 
         user = User(
             name=name,
@@ -253,7 +256,8 @@ def register_karyawan():
         flash(f"Karyawan TIF {name} berhasil didaftarkan.", "success")
         return redirect(url_for("auth.register_karyawan"))
 
-    return render_template("auth/register_karyawan.html")
+    recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
+    return render_template("auth/register_karyawan.html", recent_users=recent_users)
 
 
 @auth_bp.route("/admin/users")

@@ -1,24 +1,1046 @@
-{% extends "base.html" %}
-{% block title %}Daftarkan Karyawan TIF{% endblock %}
-{% block content %}
-<div class="card">
-    <h1>Daftarkan Karyawan TIF</h1>
-    <p class="subtitle">Akun langsung aktif setelah didaftarkan.</p>
+<!DOCTYPE html>
+<html lang="id" id="html-root" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftarkan Karyawan TIF · Asset Lifecycle Telkom</title>
+  <meta name="description" content="Pendaftaran akun Karyawan TIF baru pada Sistem Manajemen Aset & Modul Perangkat Telkom.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "navy-bg": "#071426",
+            "card-navy": "#0D1F36",
+            "border-navy": "#1E3A5F",
+            "border-navy-subtle": "#1A2E4C",
+            "electric-blue": "#1677FF",
+            "accent-cyan": "#38BDF8",
+            "soft-white": "#E6EDF7",
+            "muted-slate": "#94A3B8"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+      ::-webkit-scrollbar { display: none; }
+    }
+    .custom-scrollbar::-webkit-scrollbar { display: block; width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
 
-    <form method="POST">
-        <label for="name">Nama lengkap</label>
-        <input type="text" id="name" name="name" required autofocus>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.15); }
+    }
+    .pulse-glow { animation: pulse-slow 2.4s ease-in-out infinite; }
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .fade-up-d1 { animation-delay: 0.06s; }
+    .fade-up-d2 { animation-delay: 0.12s; }
+    .fade-up-d3 { animation-delay: 0.18s; }
 
-        <label for="password">Password sementara</label>
-        <input type="password" id="password" name="password" required>
+    /* ── Select arrow: prevent any repeating ── */
+    .field-select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-repeat: no-repeat !important;
+      background-position: right 14px center !important;
+      background-size: 16px 16px !important;
+    }
+    .dark .field-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") !important;
+    }
+    .light .field-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") !important;
+    }
 
-        <label for="district">District</label>
-        <input type="text" id="district" name="district" placeholder="Contoh: Palu" required>
+    /* ── Dark mode input styles ── */
+    .dark .field-input {
+      background: rgba(7, 20, 38, 0.75);
+      border-color: #1E3A5F;
+      color: #E6EDF7;
+    }
+    .dark .field-input::placeholder { color: #4A6580; }
+    .dark .field-input:focus {
+      border-color: #1677FF;
+      box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.2);
+      background: rgba(7, 20, 38, 0.95);
+      outline: none;
+    }
+    .dark .field-input option { background: #0D1F36; color: #E6EDF7; }
 
-        <button type="submit">Daftarkan</button>
-    </form>
+    /* ── Light mode input styles ── */
+    .light .field-input {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      color: #0F172A;
+    }
+    .light .field-input::placeholder { color: #94A3B8; }
+    .light .field-input:focus {
+      border-color: #EE2E24;
+      box-shadow: 0 0 0 3px rgba(238, 46, 36, 0.15);
+      background: #FFFFFF;
+      outline: none;
+    }
+    .light .field-input option { background: #FFFFFF; color: #0F172A; }
+
+    /* Strength bars */
+    .strength-bar { transition: background 0.3s ease, width 0.3s ease; }
+
+    /* ════════════════════════════════════════════════════════════════════
+       LIGHT MODE COMPONENT STYLES (MATCHING TELKOM LIGHT THEME DASHBOARD)
+       ════════════════════════════════════════════════════════════════════ */
+    .light { background-color: #F8FAFC; color: #0F172A; }
+    .light body { background-color: #F8FAFC !important; color: #0F172A !important; }
+
+    /* Sidebar in Light Mode */
+    .light aside,
+    .light #sidebar-root,
+    .light #sidebar-logo-header {
+      background-color: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+    }
+    .light #logo-title {
+      color: #0F172A !important;
+    }
+    .light #logo-sub {
+      color: #EE2E24 !important;
+    }
+
+    /* Nav Links in Light Mode */
+    .light .nav-link {
+      color: #475569 !important;
+    }
+    .light .nav-link:hover:not(#nav-active-item) {
+      background-color: #FEF2F2 !important;
+      color: #EE2E24 !important;
+    }
+    .light .nav-link:hover:not(#nav-active-item) .material-symbols-outlined {
+      color: #EE2E24 !important;
+    }
+    .light .nav-link .material-symbols-outlined {
+      color: #94A3B8 !important;
+    }
+    .light #nav-active-item {
+      background-color: #EE2E24 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 14px rgba(238, 46, 36, 0.25) !important;
+    }
+    .light #nav-active-item .material-symbols-outlined {
+      color: #FFFFFF !important;
+    }
+
+    /* Footer Card in Light Mode */
+    .light #sidebar-footer {
+      background-color: #F8FAFC !important;
+      border-color: #E2E8F0 !important;
+      color: #64748B !important;
+    }
+    .light #footer-status-title {
+      color: #0F172A !important;
+    }
+
+    /* Top Header in Light Mode */
+    .light #header-root {
+      background-color: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    .light #header-badge-icon-box {
+      background-color: #FEF2F2 !important;
+      border-color: #FECACA !important;
+      color: #EE2E24 !important;
+    }
+    .light #header-badge-icon {
+      color: #EE2E24 !important;
+    }
+    .light #header-badge-title {
+      color: #0F172A !important;
+    }
+    .light #header-divider {
+      background-color: #E2E8F0 !important;
+    }
+
+    /* Main Container & Cards in Light Mode */
+    .light .theme-main-bg { background-color: #F8FAFC !important; }
+    .light .theme-card { background-color: #FFFFFF !important; border-color: #E2E8F0 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important; }
+    .light .theme-text-heading { color: #0F172A !important; }
+    .light .theme-text-muted { color: #64748B !important; }
+    .light .theme-text-subtle { color: #94A3B8 !important; }
+    .light .theme-divider { border-color: #E2E8F0 !important; background-color: #E2E8F0 !important; }
+
+    /* Form Header Badge Icon in Light Mode */
+    .light #form-icon-box {
+      background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%) !important;
+      border-color: #FECACA !important;
+      box-shadow: 0 4px 14px rgba(238, 46, 36, 0.12) !important;
+    }
+    .light #form-icon {
+      color: #EE2E24 !important;
+    }
+    .light #heading-underline {
+      background-color: #EE2E24 !important;
+    }
+    .light #card-gradient-bar {
+      background: linear-gradient(to right, transparent, rgba(238, 46, 36, 0.35), transparent) !important;
+    }
+    .light #card-glow-1, .light #card-glow-2 {
+      display: none !important;
+    }
+    .light .form-input-icon {
+      color: #94A3B8 !important;
+    }
+    .light .strength-track {
+      background-color: #E2E8F0 !important;
+    }
+
+    /* "Baru Didaftarkan" Section in Light Mode */
+    .light #recent-header {
+      border-color: #F1F5F9 !important;
+    }
+    .light #recent-icon {
+      color: #EE2E24 !important;
+    }
+    .light #recent-title {
+      color: #0F172A !important;
+    }
+    .light #recent-tag {
+      background-color: #F1F5F9 !important;
+      border-color: #E2E8F0 !important;
+      color: #64748B !important;
+    }
+    .light .recent-list-row {
+      border-color: #F1F5F9 !important;
+    }
+    .light .recent-list-row:hover {
+      background-color: #F8FAFC !important;
+    }
+    .light .recent-user-avatar {
+      background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%) !important;
+      border-color: #FECACA !important;
+      color: #EE2E24 !important;
+      box-shadow: 0 2px 6px rgba(238, 46, 36, 0.1) !important;
+    }
+    .light .recent-district-badge {
+      background-color: #FEE2E2 !important;
+      border-color: #FECACA !important;
+      color: #C51A12 !important;
+    }
+    .light .recent-status-text {
+      color: #059669 !important;
+    }
+
+    /* User Profile in Light Mode */
+    .light #profile-btn:hover {
+      background-color: #F1F5F9 !important;
+    }
+    .light #profile-user-name {
+      color: #0F172A !important;
+    }
+    .light #profile-user-role {
+      color: #EE2E24 !important;
+    }
+    .light #header-user-avatar {
+      border-color: #EE2E24 !important;
+      box-shadow: 0 2px 6px rgba(238, 46, 36, 0.2) !important;
+    }
+    .light #profile-dropdown {
+      background-color: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+      color: #0F172A !important;
+    }
+    .light #profile-dropdown-user-name {
+      color: #0F172A !important;
+    }
+    .light #profile-dropdown-user-email {
+      color: #64748B !important;
+    }
+    .light #profile-dropdown-divider {
+      border-color: #F1F5F9 !important;
+    }
+  </style>
+</head>
+<body id="body-root" class="dark bg-[#071426] text-[#E6EDF7] antialiased min-h-screen w-full transition-colors duration-300">
+
+<!-- ══════════════════ COMPACT SIDEBAR (240px) ══════════════════ -->
+<aside id="sidebar-root" class="theme-sidebar fixed left-0 top-0 bottom-0 w-[240px] z-50 flex flex-col justify-between border-r border-[#1A2E4C] bg-[#071426] transition-colors duration-300">
+  <div class="flex flex-col">
+    <!-- Logo Header matching Sidebar.jsx -->
+    <div id="sidebar-logo-header" class="h-[64px] px-5 border-b border-[#1A2E4C] flex flex-col justify-center bg-[#071426] transition-colors duration-300">
+      <div class="flex items-center gap-2.5">
+        <div id="logo-badge" class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-md bg-gradient-to-br from-[#1677FF] to-[#0D1F36] shrink-0 transition-colors duration-300">
+          <span class="material-symbols-outlined text-[20px]">hub</span>
+        </div>
+        <div class="flex flex-col">
+          <span id="logo-title" class="text-sm font-bold tracking-tight leading-none text-[#E6EDF7] transition-colors duration-300">
+            AssetLifecycle
+          </span>
+          <span id="logo-sub" class="text-[10px] font-medium leading-tight mt-1 text-[#38BDF8] transition-colors duration-300">
+            Telkom Infrastructure
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation List (Synchronized with Sidebar.jsx) -->
+    <nav class="flex flex-col gap-1 px-3 pt-6 pb-3" id="sidebar-nav">
+      {% if current_user.role == 'teknisi' %}
+        <!-- TEKNISI -->
+        <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span>Pengajuan Perpindahan</span>
+        </a>
+        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span>AR/VR</span>
+        </a>
+
+      {% elif current_user.role == 'karyawan_tif' and current_user.is_pj %}
+        <!-- KARYAWAN TIF (PJ) -->
+        <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('device.devices') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span>Perangkat</span>
+        </a>
+        <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span>Lokasi</span>
+        </a>
+        <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span>Pengajuan Modul</span>
+        </a>
+        <a href="{{ url_for('auth.register_teknisi') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">person_add</span>
+          <span>Daftarkan Teknisi</span>
+        </a>
+        <a href="{{ url_for('data_import.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span>Import Data</span>
+        </a>
+        <a href="{{ url_for('export.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span>Export Data</span>
+        </a>
+        <a href="{{ url_for('audit.logs') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span>Audit Log</span>
+        </a>
+        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span>AR/VR</span>
+        </a>
+
+      {% elif current_user.role == 'karyawan_tif' and not current_user.is_pj %}
+        <!-- KARYAWAN TIF BIASA -->
+        <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('device.devices') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span>Perangkat</span>
+        </a>
+        <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span>Lokasi</span>
+        </a>
+        <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span>Pengajuan Modul</span>
+        </a>
+        <a href="{{ url_for('data_import.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span>Import Data</span>
+        </a>
+        <a href="{{ url_for('export.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span>Export Data</span>
+        </a>
+        <a href="{{ url_for('audit.logs') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span>Audit Log</span>
+        </a>
+        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span>AR/VR</span>
+        </a>
+
+      {% else %}
+        <!-- ADMIN: Full 11 items matching Sidebar.jsx -->
+        <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('device.devices') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span>Perangkat</span>
+        </a>
+        <a href="{{ url_for('device.device_types') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span>Modul</span>
+        </a>
+        <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span>Lokasi</span>
+        </a>
+        <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span>Pengajuan Modul</span>
+        </a>
+        <a href="{{ url_for('auth.manage_users') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">manage_accounts</span>
+          <span>Kelola User</span>
+        </a>
+
+        <!-- ACTIVE ITEM: Daftarkan Karyawan -->
+        <a id="nav-active-item" href="{{ url_for('auth.register_karyawan') }}" aria-current="page"
+           class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-semibold bg-[#1677FF] text-[#E6EDF7] shadow-lg shadow-[#1677FF]/25 transition-all duration-200">
+          <span class="nav-active-icon material-symbols-outlined text-[19px] text-white">badge</span>
+          <span>Daftarkan Karyawan</span>
+        </a>
+
+        <a href="{{ url_for('data_import.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
+          <span>Import Data</span>
+        </a>
+        <a href="{{ url_for('export.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
+          <span>Export Data</span>
+        </a>
+        <a href="{{ url_for('audit.logs') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
+          <span>Audit Log</span>
+        </a>
+        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span>AR/VR</span>
+        </a>
+      {% endif %}
+    </nav>
+  </div>
+
+  <!-- Footer Info Card (Exact matching Sidebar.jsx) -->
+  <div id="sidebar-footer" class="theme-footer-card p-4 mx-3 mb-4 rounded-xl border border-[#1E3A5F] bg-[#0D1F36] text-[#94A3B8] transition-colors duration-300">
+    <div class="flex items-center gap-2 text-xs font-semibold">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0 pulse-glow"></span>
+      <span id="footer-status-title" class="text-[#E6EDF7]">Sistem Aktif</span>
+    </div>
+    <p class="text-[11px] mt-1 leading-relaxed font-mono">
+      v2.4.0 • Enterprise Edition
+    </p>
+  </div>
+</aside>
+
+<!-- ══════════════════ COMPACT TOP HEADER (Synchronized with Header.jsx, Search Bar Removed) ══════════════════ -->
+<header id="header-root" class="theme-header fixed top-0 left-[240px] right-0 h-[64px] z-40 px-6 flex items-center justify-between border-b border-[#1A2E4C] bg-[#071426] shadow-[0_2px_8px_rgba(0,0,0,0.35)] transition-colors duration-300">
+  <!-- Left Side: Clean Page Breadcrumb / Status Badge (Search Bar Removed per Request) -->
+  <div class="flex items-center gap-3">
+    <div id="header-badge-icon-box" class="w-8 h-8 rounded-lg flex items-center justify-center bg-[#1677FF]/15 border border-[#1677FF]/30 text-[#38BDF8] transition-all duration-300">
+      <span class="material-symbols-outlined text-[19px]" id="header-badge-icon">badge</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <span class="theme-text-muted text-[#64748B]">Admin</span>
+      <span class="text-[#1A2E4C] theme-divider">/</span>
+      <span class="font-semibold text-[#E6EDF7] transition-colors duration-300" id="header-badge-title">Daftarkan Karyawan TIF</span>
+    </div>
+  </div>
+
+  <!-- Right Action Items -->
+  <div class="flex items-center gap-4 relative shrink-0">
+    <!-- THEME SWITCHER BUTTON matching Header.jsx -->
+    <div class="relative">
+      <button type="button" id="theme-btn" onclick="toggleTheme()"
+        title="Beralih Mode Gelap / Terang"
+        class="relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border cursor-pointer group bg-[#0D1F36] border-[#1E3A5F] text-amber-400 hover:border-amber-400/50 hover:bg-[#122846] shadow-sm hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]">
+        <span class="material-symbols-outlined text-[21px] transition-transform duration-300 group-hover:rotate-45" id="theme-btn-icon">light_mode</span>
+        <!-- Pulsing theme indicator -->
+        <span id="theme-btn-dot" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 bg-amber-400 ring-[#071426]"></span>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div id="header-divider" class="h-5 w-px bg-[#1A2E4C] transition-colors duration-300"></div>
+
+    <!-- GAMBAR 1 FIX: Real User Profile Photo & Menu matching Dashboard Header -->
+    <div class="relative" id="profile-container">
+      <button type="button" id="profile-btn" onclick="toggleProfileDropdown(event)"
+        class="flex items-center gap-2.5 p-1 rounded-full transition-colors cursor-pointer hover:bg-[#0D1F36]">
+        <div class="relative shrink-0">
+          <img
+            id="header-user-avatar"
+            src="{{ current_user.get_avatar_url() or 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK' }}"
+            onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256'"
+            alt="{{ current_user.name or 'Admin Asset' }}"
+            class="w-9 h-9 rounded-full object-cover ring-2 ring-[#1677FF] shadow-sm transition-all duration-300">
+          <span id="header-avatar-status" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#10B981] ring-2 ring-[#071426]" title="Status Online"></span>
+        </div>
+        <div class="flex flex-col text-left justify-center min-w-0 pr-1">
+          <div class="flex items-center gap-1 leading-tight">
+            <span id="profile-user-name" class="text-xs font-semibold text-[#E6EDF7] truncate max-w-[130px]">{{ current_user.name or 'Admin Asset' }}</span>
+            <span class="material-symbols-outlined text-[17px] text-[#94A3B8] transition-transform duration-200" id="profile-chevron">expand_more</span>
+          </div>
+          <span id="profile-user-role" class="text-[11px] text-[#38BDF8] leading-none mt-0.5">{{ current_user.role|capitalize if current_user.role else 'Admin' }}</span>
+        </div>
+      </button>
+
+      <!-- Dropdown Popover matching Header.jsx profile card -->
+      <div id="profile-dropdown" class="absolute right-0 top-12 mt-2 w-72 rounded-2xl bg-[#0D1F36] border border-[#1E3653] shadow-2xl p-4 z-50 transition-all duration-200 transform origin-top-right hidden opacity-0 scale-95">
+        <div class="flex items-center gap-3 pb-3 border-b border-[#1A2E4C]" id="profile-dropdown-divider">
+          <img
+            id="dropdown-user-avatar"
+            src="{{ current_user.get_avatar_url() or 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK' }}"
+            onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256'"
+            alt="{{ current_user.name or 'Admin' }}"
+            class="w-11 h-11 rounded-full object-cover ring-2 ring-[#1677FF]/40 shadow-sm shrink-0">
+          <div class="flex flex-col min-w-0 flex-1">
+            <p class="text-xs font-semibold text-[#E6EDF7] truncate" id="profile-dropdown-user-name">{{ current_user.name or 'Admin Asset' }}</p>
+            <p class="text-[11px] text-[#94A3B8] truncate" id="profile-dropdown-user-email">{{ current_user.email or 'admin@telkom.co.id' }}</p>
+            <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-[#1677FF]/20 text-[#38BDF8] border border-[#1677FF]/30 rounded-full w-fit">
+              {{ current_user.role|capitalize if current_user.role else 'Admin' }}
+            </span>
+          </div>
+        </div>
+        <div class="pt-2">
+          <a href="{{ url_for('auth.logout') }}"
+             class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors">
+            <span class="material-symbols-outlined text-[17px]">logout</span>
+            <span>Keluar dari Akun</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════ MAIN VIEW CONTAINER ══════════════════ -->
+<div id="main-container" class="theme-main-bg pl-[240px] pt-[64px] flex flex-col min-h-screen bg-[#071426] w-full transition-colors duration-300">
+  <main class="p-6 md:p-8 space-y-6 flex-1 w-full max-w-[860px]">
+
+    <!-- Breadcrumb in Main Content -->
+    <div class="flex items-center gap-2 text-xs">
+      <a href="{{ url_for('index') }}" class="theme-text-muted text-[#64748B] hover:text-[#1677FF] transition-colors flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">home</span>
+        <span>Dashboard</span>
+      </a>
+      <span class="text-[#1A2E4C] theme-divider">/</span>
+      <span class="theme-text-muted text-[#64748B]">Kelola User</span>
+      <span class="text-[#1A2E4C] theme-divider">/</span>
+      <span class="font-semibold text-[#1677FF]" id="breadcrumb-current">Daftarkan Karyawan</span>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-container" class="space-y-2 fade-up">
+          {% for category, message in messages %}
+            {% if category == 'success' %}
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[13px] shadow-sm">
+              <span class="material-symbols-outlined text-[18px] text-emerald-400 shrink-0">check_circle</span>
+              <span class="flex-1">{{ message }}</span>
+              <button onclick="this.parentElement.remove()" class="text-emerald-400/60 hover:text-emerald-400 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+            {% else %}
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[13px] shadow-sm">
+              <span class="material-symbols-outlined text-[18px] text-rose-400 shrink-0">error</span>
+              <span class="flex-1">{{ message }}</span>
+              <button onclick="this.parentElement.remove()" class="text-rose-400/60 hover:text-rose-400 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- ── FORM CARD ── -->
+    <div id="form-card" class="theme-card relative rounded-2xl border border-[#1E3A5F] bg-[#0D1F36] shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden fade-up transition-colors duration-300">
+      <!-- Ambient Glow (Dark Mode only) -->
+      <div id="card-glow-1" class="absolute -top-16 -right-16 w-56 h-56 bg-[#1677FF]/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div id="card-glow-2" class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#38BDF8]/8 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Card Header (GAMBAR 2 FIX) -->
+      <div id="form-card-header" class="relative px-7 pt-6 pb-5 border-b border-[#1A2E4C] transition-colors duration-300">
+        <div class="flex items-center gap-4">
+          <!-- GAMBAR 2 ICON BOX: adapts cleanly to dark (navy-cyan) & light (red-telkom pastel) -->
+          <div id="form-icon-box" class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1677FF]/25 to-[#0D1F36] border border-[#1677FF]/40 flex items-center justify-center shrink-0 shadow-md shadow-[#1677FF]/20 transition-all duration-300">
+            <span class="material-symbols-outlined text-[22px] text-[#38BDF8] transition-colors duration-300" id="form-icon">badge</span>
+          </div>
+          <div>
+            <h1 id="page-heading" class="theme-text-heading text-[18px] font-bold text-[#E6EDF7] leading-tight transition-colors duration-300">Daftarkan Karyawan TIF</h1>
+            <div id="heading-underline" class="w-10 h-0.5 bg-[#1677FF] rounded-full mt-1.5 mb-1.5 transition-colors duration-300"></div>
+            <p id="page-subheading" class="theme-text-muted text-[13px] text-[#94A3B8] transition-colors duration-300">Akun personil langsung aktif dan terdaftar pada database sistem.</p>
+          </div>
+        </div>
+      </div>
+      <div id="card-gradient-bar" class="w-full h-px bg-gradient-to-r from-transparent via-[#1677FF]/30 to-transparent transition-all duration-300"></div>
+
+      <!-- Form Body -->
+      <form method="POST" id="register-form" class="relative px-7 py-6 space-y-5" novalidate>
+
+        <!-- Nama Lengkap -->
+        <div class="fade-up fade-up-d1">
+          <label for="name" id="label-name" class="theme-text-muted block text-[11px] font-semibold text-[#94A3B8] mb-2 tracking-widest uppercase">
+            Nama Lengkap
+          </label>
+          <div class="relative">
+            <span class="form-input-icon absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-[17px] text-[#4A6580] pointer-events-none">person</span>
+            <input type="text" id="name" name="name" required autofocus
+              placeholder="Masukkan nama lengkap karyawan"
+              class="field-input w-full pl-10 pr-4 py-3 rounded-xl border text-[13px] transition-all duration-200">
+          </div>
+        </div>
+
+        <!-- Email Perusahaan -->
+        <div class="fade-up fade-up-d1">
+          <label for="email" id="label-email" class="theme-text-muted block text-[11px] font-semibold text-[#94A3B8] mb-2 tracking-widest uppercase">
+            Email Perusahaan
+          </label>
+          <div class="relative">
+            <span class="form-input-icon absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-[17px] text-[#4A6580] pointer-events-none">mail</span>
+            <input type="email" id="email" name="email" required
+              placeholder="karyawan@telkom.co.id"
+              class="field-input w-full pl-10 pr-4 py-3 rounded-xl border text-[13px] transition-all duration-200">
+          </div>
+        </div>
+
+        <!-- Password Sementara -->
+        <div class="fade-up fade-up-d2">
+          <label for="password" id="label-password" class="theme-text-muted block text-[11px] font-semibold text-[#94A3B8] mb-2 tracking-widest uppercase">
+            Password Sementara
+          </label>
+          <div class="relative">
+            <span class="form-input-icon absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-[17px] text-[#4A6580] pointer-events-none">lock</span>
+            <input type="password" id="password" name="password" required
+              placeholder="Masukkan password akun baru"
+              oninput="checkPasswordStrength(this.value)"
+              class="field-input w-full pl-10 pr-12 py-3 rounded-xl border text-[13px] transition-all duration-200">
+            <button type="button" onclick="togglePassword()" id="toggle-pw-btn"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4A6580] hover:text-[#38BDF8] transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]" id="pw-eye-icon">visibility</span>
+            </button>
+          </div>
+          <!-- Strength Bars -->
+          <div class="mt-2.5 space-y-1.5">
+            <div class="flex gap-1.5">
+              <div class="strength-track h-1 flex-1 rounded-full bg-[#1A2E4C] overflow-hidden"><div id="bar-1" class="strength-bar h-full w-0 rounded-full"></div></div>
+              <div class="strength-track h-1 flex-1 rounded-full bg-[#1A2E4C] overflow-hidden"><div id="bar-2" class="strength-bar h-full w-0 rounded-full"></div></div>
+              <div class="strength-track h-1 flex-1 rounded-full bg-[#1A2E4C] overflow-hidden"><div id="bar-3" class="strength-bar h-full w-0 rounded-full"></div></div>
+              <div class="strength-track h-1 flex-1 rounded-full bg-[#1A2E4C] overflow-hidden"><div id="bar-4" class="strength-bar h-full w-0 rounded-full"></div></div>
+            </div>
+            <p class="theme-text-subtle text-[11px] text-[#4A6580] font-mono" id="pw-hint">Minimal 8 karakter, gunakan kombinasi huruf besar, kecil, dan angka.</p>
+          </div>
+        </div>
+
+        <!-- District Selection -->
+        <div class="fade-up fade-up-d3">
+          <label for="district" id="label-district" class="theme-text-muted block text-[11px] font-semibold text-[#94A3B8] mb-2 tracking-widest uppercase">
+            District Penugasan
+          </label>
+          <div class="relative">
+            <span class="form-input-icon absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-[17px] text-[#4A6580] pointer-events-none z-10">location_on</span>
+            <select id="district" name="district" required
+              class="field-input field-select w-full pl-10 pr-10 py-3 rounded-xl border text-[13px] transition-all duration-200 cursor-pointer">
+              <option value="" disabled selected>Pilih district penugasan</option>
+              <option value="PALU1">PALU1</option>
+              <option value="PALU2">PALU2</option>
+              <option value="PALU3">PALU3</option>
+              <option value="DONGGALA">DONGGALA</option>
+              <option value="SIGI">SIGI</option>
+              <option value="PARIGI">PARIGI</option>
+              <option value="TOLITOLI">TOLITOLI</option>
+              <option value="BUOL">BUOL</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit Row -->
+        <div class="flex items-center justify-between pt-2 fade-up fade-up-d3">
+          <span id="success-hint" class="hidden items-center gap-1.5 text-[12px] text-[#38BDF8] font-medium">
+            <span class="material-symbols-outlined text-[15px]">check_circle</span>
+            Karyawan ditambahkan ke sistem.
+          </span>
+          <div class="flex-1"></div>
+          <button type="submit" id="submit-btn"
+            class="group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1677FF] hover:bg-blue-500 text-white text-[13px] font-semibold shadow-lg shadow-[#1677FF]/30 hover:shadow-blue-500/40 transition-all duration-200 active:scale-[0.98] cursor-pointer overflow-hidden">
+            <span class="material-symbols-outlined text-[18px] relative z-10">person_add</span>
+            <span class="relative z-10 font-semibold" id="submit-btn-text">Daftarkan Karyawan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── GAMBAR 3 FIX: RECENTLY REGISTERED CARD ── -->
+    {% if recent_users %}
+    <div id="recent-card" class="theme-card rounded-2xl border border-[#1E3A5F] bg-[#0D1F36] shadow-[0_4px_20px_rgba(0,0,0,0.3)] overflow-hidden fade-up fade-up-d2 transition-colors duration-300">
+      <div id="recent-header" class="px-6 py-4 flex items-center justify-between border-b border-[#1A2E4C] transition-colors duration-300">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[18px] text-[#38BDF8] transition-colors duration-300" id="recent-icon">group</span>
+          <h2 class="theme-text-heading text-[13px] font-semibold text-[#E6EDF7] transition-colors duration-300" id="recent-title">Baru Didaftarkan</h2>
+        </div>
+        <span class="text-[11px] font-mono px-2.5 py-1 rounded-full border transition-colors duration-300 bg-[#071426]/60 border-[#1A2E4C] text-[#4A6580]" id="recent-tag">Sesi Ini</span>
+      </div>
+      <div class="divide-y divide-[#1A2E4C]/50" id="recent-list">
+        {% for u in recent_users %}
+        <div class="recent-list-row flex items-center gap-4 px-6 py-3.5 hover:bg-[#122846]/50 transition-colors duration-150 group">
+          <!-- User initial badge: adapts beautifully in dark and light modes -->
+          <div class="recent-user-avatar w-9 h-9 rounded-full bg-gradient-to-br from-[#1677FF]/30 to-[#0D1F36] border border-[#1677FF]/30 flex items-center justify-center shrink-0 text-[#38BDF8] font-bold text-[13px] uppercase transition-all duration-300">
+            {{ u.name[0] if u.name else '?' }}
+          </div>
+          <div class="flex flex-col min-w-0 flex-1">
+            <span class="recent-user-name theme-text-heading text-[13px] font-semibold text-[#E6EDF7] truncate transition-colors duration-300">
+              {{ u.name }}
+            </span>
+            <span class="recent-user-email theme-text-muted text-[11px] text-[#64748B] truncate transition-colors duration-300">{{ u.email }}</span>
+          </div>
+          <div class="shrink-0 flex items-center gap-3">
+            <span class="recent-district-badge px-2.5 py-1 rounded-lg bg-[#1677FF]/10 border border-[#1677FF]/20 text-[#38BDF8] text-[11px] font-mono font-semibold tracking-wide transition-colors duration-300">
+              {{ u.district|upper if u.district else '—' }}
+            </span>
+            <span class="recent-status-text text-[11px] font-medium text-emerald-400 flex items-center gap-1 transition-colors duration-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Aktif
+            </span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </main>
 </div>
-{% endblock %}
+
+<!-- ════════════════ SCRIPTS: FULL SYNCHRONIZATION WITH DASHBOARD ════════════════ -->
+<script>
+  // ── THEME MANAGER (Synchronized with asset-app-theme & theme in localStorage) ──
+  const htmlEl = document.getElementById('html-root');
+  const bodyEl = document.getElementById('body-root');
+  const sidebarRoot = document.getElementById('sidebar-root');
+  const sidebarLogoHeader = document.getElementById('sidebar-logo-header');
+  const headerRoot = document.getElementById('header-root');
+  const sidebarFooter = document.getElementById('sidebar-footer');
+  const mainContainer = document.getElementById('main-container');
+
+  const themeBtn = document.getElementById('theme-btn');
+  const themeBtnIcon = document.getElementById('theme-btn-icon');
+  const themeBtnDot = document.getElementById('theme-btn-dot');
+  const logoBadge = document.getElementById('logo-badge');
+  const logoTitle = document.getElementById('logo-title');
+  const logoSub = document.getElementById('logo-sub');
+  const navActiveItem = document.getElementById('nav-active-item');
+  const submitBtn = document.getElementById('submit-btn');
+  const headerAvatar = document.getElementById('header-user-avatar');
+  const headerAvatarStatus = document.getElementById('header-avatar-status');
+
+  const headerBadgeIconBox = document.getElementById('header-badge-icon-box');
+  const headerBadgeIcon = document.getElementById('header-badge-icon');
+  const headerBadgeTitle = document.getElementById('header-badge-title');
+
+  function applyTheme(mode) {
+    const isDark = (mode === 'dark');
+
+    if (isDark) {
+      htmlEl.classList.remove('light');
+      htmlEl.classList.add('dark');
+      bodyEl.style.backgroundColor = '#071426';
+      bodyEl.style.color = '#E6EDF7';
+
+      // Sidebar & Header Backgrounds (Strict inline override for bulletproof themes)
+      if (sidebarRoot) {
+        sidebarRoot.style.backgroundColor = '#071426';
+        sidebarRoot.style.borderColor = '#1A2E4C';
+      }
+      if (sidebarLogoHeader) {
+        sidebarLogoHeader.style.backgroundColor = '#071426';
+        sidebarLogoHeader.style.borderColor = '#1A2E4C';
+      }
+      if (headerRoot) {
+        headerRoot.style.backgroundColor = '#071426';
+        headerRoot.style.borderColor = '#1A2E4C';
+        headerRoot.style.boxShadow = '0 2px 8px rgba(0,0,0,0.35)';
+      }
+      if (sidebarFooter) {
+        sidebarFooter.style.backgroundColor = '#0D1F36';
+        sidebarFooter.style.borderColor = '#1E3A5F';
+        sidebarFooter.style.color = '#94A3B8';
+      }
+      if (mainContainer) {
+        mainContainer.style.backgroundColor = '#071426';
+      }
+
+      // Header Status Badge (Left)
+      if (headerBadgeIconBox) {
+        headerBadgeIconBox.className = "w-8 h-8 rounded-lg flex items-center justify-center bg-[#1677FF]/15 border border-[#1677FF]/30 text-[#38BDF8] transition-all duration-300";
+      }
+      if (headerBadgeIcon) headerBadgeIcon.className = "material-symbols-outlined text-[19px] text-[#38BDF8]";
+      if (headerBadgeTitle) headerBadgeTitle.className = "font-semibold text-[#E6EDF7] transition-colors duration-300";
+
+      // Theme toggle button
+      if (themeBtn) {
+        themeBtn.className = "relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border cursor-pointer group bg-[#0D1F36] border-[#1E3A5F] text-amber-400 hover:border-amber-400/50 hover:bg-[#122846] shadow-sm hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]";
+      }
+      if (themeBtnIcon) themeBtnIcon.textContent = 'light_mode';
+      if (themeBtnDot) themeBtnDot.className = "absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 bg-amber-400 ring-[#071426]";
+
+      // Sidebar Logo
+      if (logoBadge) logoBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-md bg-gradient-to-br from-[#1677FF] to-[#0D1F36] shrink-0 transition-colors duration-300";
+      if (logoTitle) logoTitle.className = "text-sm font-bold tracking-tight leading-none text-[#E6EDF7] transition-colors duration-300";
+      if (logoSub) logoSub.className = "text-[10px] font-medium leading-tight mt-1 text-[#38BDF8] transition-colors duration-300";
+
+      // Active Nav Item
+      if (navActiveItem) {
+        navActiveItem.className = "nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-semibold bg-[#1677FF] text-[#E6EDF7] shadow-lg shadow-[#1677FF]/25 transition-all duration-200";
+        const icon = navActiveItem.querySelector('.material-symbols-outlined');
+        if (icon) icon.className = "material-symbols-outlined text-[19px] text-white";
+      }
+
+      // Inactive Nav Links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.id !== 'nav-active-item') {
+          link.className = "nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200";
+          const icon = link.querySelector('.material-symbols-outlined');
+          if (icon) icon.className = "material-symbols-outlined text-[19px] text-[#64748B]";
+        }
+      });
+
+      // Submit Button
+      if (submitBtn) {
+        submitBtn.className = "group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1677FF] hover:bg-blue-500 text-white text-[13px] font-semibold shadow-lg shadow-[#1677FF]/30 hover:shadow-blue-500/40 transition-all duration-200 active:scale-[0.98] cursor-pointer overflow-hidden";
+      }
+
+      // User Avatar Ring
+      if (headerAvatar) {
+        headerAvatar.className = "w-9 h-9 rounded-full object-cover ring-2 ring-[#1677FF] shadow-sm transition-all duration-300";
+      }
+      if (headerAvatarStatus) {
+        headerAvatarStatus.className = "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#10B981] ring-2 ring-[#071426]";
+      }
+
+    } else {
+      // ── LIGHT MODE (Telkom Clean Light Dashboard) ──
+      htmlEl.classList.remove('dark');
+      htmlEl.classList.add('light');
+      bodyEl.style.backgroundColor = '#F8FAFC';
+      bodyEl.style.color = '#0F172A';
+
+      // Sidebar & Header Backgrounds: PURE WHITE WITH CRISP SLATE BORDERS
+      if (sidebarRoot) {
+        sidebarRoot.style.backgroundColor = '#FFFFFF';
+        sidebarRoot.style.borderColor = '#E2E8F0';
+      }
+      if (sidebarLogoHeader) {
+        sidebarLogoHeader.style.backgroundColor = '#FFFFFF';
+        sidebarLogoHeader.style.borderColor = '#E2E8F0';
+      }
+      if (headerRoot) {
+        headerRoot.style.backgroundColor = '#FFFFFF';
+        headerRoot.style.borderColor = '#E2E8F0';
+        headerRoot.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+      }
+      if (sidebarFooter) {
+        sidebarFooter.style.backgroundColor = '#F8FAFC';
+        sidebarFooter.style.borderColor = '#E2E8F0';
+        sidebarFooter.style.color = '#64748B';
+      }
+      if (mainContainer) {
+        mainContainer.style.backgroundColor = '#F8FAFC';
+      }
+
+      // Header Status Badge (Left)
+      if (headerBadgeIconBox) {
+        headerBadgeIconBox.className = "w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 border border-red-200 text-[#EE2E24] transition-all duration-300";
+      }
+      if (headerBadgeIcon) headerBadgeIcon.className = "material-symbols-outlined text-[19px] text-[#EE2E24]";
+      if (headerBadgeTitle) headerBadgeTitle.className = "font-semibold text-slate-900 transition-colors duration-300";
+
+      // Theme toggle button
+      if (themeBtn) {
+        themeBtn.className = "relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border cursor-pointer group bg-red-50 border-red-200 text-[#EE2E24] hover:bg-red-100 shadow-sm hover:shadow-[0_0_12px_rgba(238,46,36,0.2)]";
+      }
+      if (themeBtnIcon) themeBtnIcon.textContent = 'dark_mode';
+      if (themeBtnDot) themeBtnDot.className = "absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 bg-[#EE2E24] ring-white";
+
+      // Sidebar Logo (Red Telkom Theme with Black Bold Text)
+      if (logoBadge) logoBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-md bg-gradient-to-br from-[#EE2E24] to-[#C51A12] shrink-0 transition-colors duration-300";
+      if (logoTitle) logoTitle.className = "text-sm font-bold tracking-tight leading-none text-slate-900 transition-colors duration-300";
+      if (logoSub) logoSub.className = "text-[10px] font-medium leading-tight mt-1 text-[#EE2E24] transition-colors duration-300";
+
+      // Active Nav Item (Telkom Red)
+      if (navActiveItem) {
+        navActiveItem.className = "nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-semibold bg-[#EE2E24] text-white shadow-md shadow-[#EE2E24]/20 transition-all duration-200";
+        const icon = navActiveItem.querySelector('.material-symbols-outlined');
+        if (icon) icon.className = "material-symbols-outlined text-[19px] text-white";
+      }
+
+      // Inactive Nav Links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.id !== 'nav-active-item') {
+          link.className = "nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-[#EE2E24] hover:bg-red-50/70 transition-all duration-200";
+          const icon = link.querySelector('.material-symbols-outlined');
+          if (icon) icon.className = "material-symbols-outlined text-[19px] text-slate-400";
+        }
+      });
+
+      // Submit Button
+      if (submitBtn) {
+        submitBtn.className = "group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#EE2E24] hover:bg-red-600 text-white text-[13px] font-semibold shadow-lg shadow-[#EE2E24]/25 hover:shadow-red-600/30 transition-all duration-200 active:scale-[0.98] cursor-pointer overflow-hidden";
+      }
+
+      // User Avatar Ring
+      if (headerAvatar) {
+        headerAvatar.className = "w-9 h-9 rounded-full object-cover ring-2 ring-[#EE2E24] shadow-sm transition-all duration-300";
+      }
+      if (headerAvatarStatus) {
+        headerAvatarStatus.className = "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white";
+      }
+    }
+
+    // Persist to both keys for full compatibility with React dashboard
+    localStorage.setItem('asset-app-theme', mode);
+    localStorage.setItem('theme', mode);
+  }
+
+  function toggleTheme() {
+    const current = localStorage.getItem('asset-app-theme') || localStorage.getItem('theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  // Initialize theme on load
+  (function initTheme() {
+    const saved = localStorage.getItem('asset-app-theme') || localStorage.getItem('theme') || 'dark';
+    applyTheme(saved);
+  })();
+
+  // ── PROFILE DROPDOWN ───────────────────────────────────────
+  function toggleProfileDropdown(event) {
+    if (event) event.stopPropagation();
+    const dropdown = document.getElementById('profile-dropdown');
+    const chevron = document.getElementById('profile-chevron');
+    if (!dropdown) return;
+
+    const isHidden = dropdown.classList.contains('hidden');
+    if (isHidden) {
+      dropdown.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        dropdown.classList.remove('opacity-0', 'scale-95');
+      });
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
+    } else {
+      dropdown.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => dropdown.classList.add('hidden'), 150);
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const container = document.getElementById('profile-container');
+    const dropdown = document.getElementById('profile-dropdown');
+    const chevron = document.getElementById('profile-chevron');
+    if (container && !container.contains(e.target) && dropdown && !dropdown.classList.contains('hidden')) {
+      dropdown.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => dropdown.classList.add('hidden'), 150);
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  });
+
+  // ── PASSWORD VISIBILITY TOGGLE ─────────────────────────────
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const eye = document.getElementById('pw-eye-icon');
+    if (!pw || !eye) return;
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+    eye.textContent = pw.type === 'password' ? 'visibility' : 'visibility_off';
+  }
+
+  // ── PASSWORD STRENGTH CHECKER ──────────────────────────────
+  function checkPasswordStrength(val) {
+    const bars = ['bar-1','bar-2','bar-3','bar-4'].map(id => document.getElementById(id));
+    const hint = document.getElementById('pw-hint');
+    if (!bars[0] || !hint) return;
+
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const colors = { 1:'#EF4444', 2:'#F59E0B', 3:'#38BDF8', 4:'#10B981' };
+    const labels = { 0:'', 1:'Sangat lemah', 2:'Cukup kuat', 3:'Kuat', 4:'Sangat kuat' };
+    const hintColors = { 1:'text-red-400', 2:'text-amber-400', 3:'text-[#38BDF8]', 4:'text-emerald-400' };
+
+    bars.forEach((b, i) => {
+      if (b) {
+        b.style.width = i < score ? '100%' : '0%';
+        b.style.background = i < score ? (colors[score] || '#EF4444') : 'transparent';
+      }
+    });
+
+    if (!val) {
+      hint.textContent = 'Minimal 8 karakter, gunakan kombinasi huruf besar, kecil, dan angka.';
+      hint.className = 'theme-text-subtle text-[11px] text-[#4A6580] font-mono';
+    } else {
+      hint.textContent = labels[score] || 'Terlalu pendek';
+      hint.className = `text-[11px] font-mono font-semibold ${hintColors[score] || 'text-red-400'}`;
+    }
+  }
+
+  // ── FLASH AUTO DISMISS ─────────────────────────────────────
+  (function() {
+    const fc = document.getElementById('flash-container');
+    if (!fc) return;
+    if (fc.querySelector('.bg-emerald-500\\/10')) {
+      const sh = document.getElementById('success-hint');
+      if (sh) { sh.classList.remove('hidden'); sh.classList.add('flex'); }
+    }
+    setTimeout(() => { fc.style.transition = 'opacity 0.4s'; fc.style.opacity = '0'; }, 4000);
+    setTimeout(() => { fc.remove(); }, 4500);
+  })();
+
+  // ── SUBMIT LOADING ANIMATION ──────────────────────────────
+  document.getElementById('register-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    const isDark = htmlEl.classList.contains('dark');
+    const bgGradient = isDark
+      ? 'from-[#1677FF] to-[#38BDF8]'
+      : 'from-[#EE2E24] to-[#C51A12]';
+
+    btn.innerHTML = `
+      <div class="absolute inset-0 bg-gradient-to-r ${bgGradient} rounded-xl"></div>
+      <span class="material-symbols-outlined text-[18px] relative z-10 animate-spin">progress_activity</span>
+      <span class="relative z-10 font-semibold">Mendaftarkan...</span>`;
+    btn.disabled = true;
+    btn.classList.add('opacity-85', 'cursor-not-allowed');
+  });
+</script>
+
+</body>
+</html>
