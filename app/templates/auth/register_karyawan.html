@@ -198,8 +198,11 @@
     .light #heading-underline {
       background-color: #EE2E24 !important;
     }
+    .light #form-card-header {
+      border-color: #F1F5F9 !important;
+    }
     .light #card-gradient-bar {
-      background: linear-gradient(to right, transparent, rgba(238, 46, 36, 0.35), transparent) !important;
+      display: none !important;
     }
     .light #card-glow-1, .light #card-glow-2 {
       display: none !important;
@@ -258,8 +261,24 @@
       color: #EE2E24 !important;
     }
     .light #header-user-avatar {
-      border-color: #EE2E24 !important;
-      box-shadow: 0 2px 6px rgba(238, 46, 36, 0.2) !important;
+      --tw-ring-color: #EE2E24 !important;
+      box-shadow: 0 0 0 2px #EE2E24, 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    .dark #header-user-avatar {
+      --tw-ring-color: #1677FF !important;
+      box-shadow: 0 0 0 2px #1677FF, 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    .light #header-avatar-status {
+      box-shadow: 0 0 0 2px #FFFFFF !important;
+    }
+    .dark #header-avatar-status {
+      box-shadow: 0 0 0 2px #071426 !important;
+    }
+    .light #dropdown-user-avatar {
+      box-shadow: 0 0 0 2px rgba(238, 46, 36, 0.5) !important;
+    }
+    .dark #dropdown-user-avatar {
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.5) !important;
     }
     .light #profile-dropdown {
       background-color: #FFFFFF !important;
@@ -542,17 +561,6 @@
 <div id="main-container" class="theme-main-bg pl-[240px] pt-[64px] flex flex-col min-h-screen bg-[#071426] w-full transition-colors duration-300">
   <main class="p-6 md:p-8 space-y-6 flex-1 w-full max-w-[860px]">
 
-    <!-- Breadcrumb in Main Content -->
-    <div class="flex items-center gap-2 text-xs">
-      <a href="{{ url_for('index') }}" class="theme-text-muted text-[#64748B] hover:text-[#1677FF] transition-colors flex items-center gap-1">
-        <span class="material-symbols-outlined text-[16px]">home</span>
-        <span>Dashboard</span>
-      </a>
-      <span class="text-[#1A2E4C] theme-divider">/</span>
-      <span class="theme-text-muted text-[#64748B]">Kelola User</span>
-      <span class="text-[#1A2E4C] theme-divider">/</span>
-      <span class="font-semibold text-[#1677FF]" id="breadcrumb-current">Daftarkan Karyawan</span>
-    </div>
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
