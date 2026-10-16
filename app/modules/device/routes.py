@@ -116,8 +116,20 @@ def locations():
         flash(f"Lokasi '{nama_lokasi}' berhasil ditambahkan.", "success")
         return redirect(url_for("device.locations"))
 
-    locs = Location.query.order_by(Location.nama_lokasi).all()
-    return render_template("device/locations.html", locations=locs)
+    show_all = request.args.get("all", "0") == "1"
+    if show_all:
+        locs = Location.query.order_by(Location.nama_lokasi).all()
+    else:
+        # Default fokus inventaris Palu: STO PALU 1 dan STO PALU 2
+        locs = (
+            Location.query.filter(
+                (Location.nama_lokasi.in_(["STO PALU 1", "STO PALU 2"]))
+                | (Location.district == "PALU")
+            )
+            .order_by(Location.nama_lokasi)
+            .all()
+        )
+    return render_template("device/locations.html", locations=locs, show_all=show_all)
 
 
 # ---------------- Devices (FR-3.1, FR-3.2, Admin & Karyawan TIF) ----------------
@@ -154,10 +166,15 @@ def devices():
     # FR-3.2: filter berdasarkan lokasi dan device type
     location_filter = request.args.get("location_id", type=int)
     device_type_filter = request.args.get("device_type_id", type=int)
+    show_all = request.args.get("all", "0") == "1"
 
     query = Device.query
     if location_filter:
         query = query.filter_by(location_id=location_filter)
+    elif not show_all:
+        # Default fokus inventaris Palu PSS24: WN-24X-SUL-PAL11 (STO PALU 1) dan WN-24X-SUL-PAL211 (STO PALU 2)
+        query = query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"]))
+
     if device_type_filter:
         query = query.filter_by(device_type_id=device_type_filter)
 
@@ -172,4 +189,5 @@ def devices():
         all_locations=all_locations,
         selected_location=location_filter,
         selected_type=device_type_filter,
+        show_all=show_all,
     )

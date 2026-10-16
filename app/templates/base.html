@@ -8,7 +8,24 @@
 </head>
 <body>
     <header class="topbar">
-        <a href="{{ url_for('index') }}" class="topbar__brand">Asset Lifecycle</a>
+        <div style="display:flex;align-items:center;gap:20px;">
+            <a href="{{ url_for('index') }}" class="topbar__brand">Asset Lifecycle</a>
+            {% if current_user.is_authenticated %}
+            <nav class="topbar__menu" style="display:flex;gap:14px;font-size:0.9rem;">
+                <a href="{{ url_for('index') }}" style="color:var(--ink-soft);text-decoration:none;">Dashboard</a>
+                <a href="{{ url_for('device.devices') }}" style="color:var(--ink-soft);text-decoration:none;">Perangkat</a>
+                <a href="{{ url_for('module_request.inventory') }}" style="color:var(--accent);font-weight:600;text-decoration:none;">Modul</a>
+                <a href="{{ url_for('device.locations') }}" style="color:var(--ink-soft);text-decoration:none;">Lokasi</a>
+                <a href="{{ url_for('module_request.list_requests') }}" style="color:var(--ink-soft);text-decoration:none;">Pengajuan</a>
+                {% if current_user.role in ['admin', 'karyawan_tif'] %}
+                <a href="{{ url_for('data_import.index') }}" style="color:var(--ink-soft);text-decoration:none;">Import</a>
+                <a href="{{ url_for('export.index') }}" style="color:var(--ink-soft);text-decoration:none;">Export</a>
+                <a href="{{ url_for('audit.logs') }}" style="color:var(--ink-soft);text-decoration:none;">Audit Log</a>
+                {% endif %}
+                <a href="{{ url_for('ar.scan') }}" style="color:var(--ink-soft);text-decoration:none;">AR/VR</a>
+            </nav>
+            {% endif %}
+        </div>
         <nav class="topbar__nav">
             {% if current_user.is_authenticated %}
                 <span class="topbar__user">{{ current_user.name }} &middot; {{ current_user.role }}{% if current_user.is_pj %} &middot; PJ{% endif %}</span>

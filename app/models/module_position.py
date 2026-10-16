@@ -16,7 +16,9 @@ class ModulePosition(db.Model):
     slot_definition_id = db.Column(db.Integer, db.ForeignKey("slot_definitions.slot_definition_id"))
     installed_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="aktif")
+    shelf = db.Column(db.String(20))
+    port = db.Column(db.String(50))
 
-    module = db.relationship("Module", foreign_keys=[module_id])
+    module = db.relationship("Module", foreign_keys=[module_id], back_populates="positions")
     device = db.relationship("Device", foreign_keys=[device_id])
     slot_definition = db.relationship("SlotDefinition", foreign_keys=[slot_definition_id])

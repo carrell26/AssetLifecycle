@@ -28,29 +28,40 @@
         </div>
     </form>
 
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:0.88rem;color:var(--ink-soft);">
+            {% if selected_location or selected_type or show_all %}
+                Menampilkan hasil filter
+            {% else %}
+                Fokus inventaris aktif: STO PALU 1 &amp; STO PALU 2
+            {% endif %}
+        </span>
+        <div>
+            {% if show_all %}
+                <a href="{{ url_for('device.devices') }}" class="btn btn--secondary btn--small">Fokus Inventaris Palu</a>
+            {% else %}
+                <a href="{{ url_for('device.devices', all=1) }}" class="btn btn--secondary btn--small">Tampilkan Semua Perangkat</a>
+            {% endif %}
+        </div>
+    </div>
+
     <table>
         <thead>
             <tr>
-                <th>Nama Perangkat</th>
+                <th>Nama Perangkat/NE</th>
                 <th>Tipe</th>
                 <th>Lokasi</th>
-                <th>Hostname</th>
-                <th>Serial Number</th>
-                <th>Status</th>
             </tr>
         </thead>
         <tbody>
             {% for d in devices %}
             <tr>
-                <td>{{ d.nama_perangkat }}</td>
+                <td><strong>{{ d.nama_perangkat or d.hostname }}</strong></td>
                 <td>{{ d.device_type.nama_tipe if d.device_type else "-" }}</td>
                 <td>{{ d.location.nama_lokasi if d.location else "-" }}</td>
-                <td>{{ d.hostname or "-" }}</td>
-                <td>{{ d.serial_number or "-" }}</td>
-                <td>{{ d.status or "-" }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="6">Belum ada perangkat yang cocok dengan filter ini.</td></tr>
+            <tr><td colspan="3">Belum ada perangkat yang cocok dengan filter ini.</td></tr>
             {% endfor %}
         </tbody>
     </table>

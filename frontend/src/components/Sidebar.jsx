@@ -10,17 +10,19 @@ export default function Sidebar({ user }) {
   let navItems = [];
 
   if (role === "teknisi") {
-    // 4. TEKNISI: Dashboard, Pengajuan Perpindahan, dan AR/VR
+    // 4. TEKNISI: Dashboard, Modul (view-only), Pengajuan, dan AR/VR
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: true },
+      { id: "modul", label: "Modul", icon: "memory", href: "/modules/" },
       { id: "pengajuan", label: "Pengajuan Perpindahan", icon: "assignment", href: "/modules/requests" },
       { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
     ];
   } else if (role === "karyawan_tif" && isPj) {
-    // 2. KARYAWAN TIF (PJ): Daftarkan Teknisi aktif, Modul dihapus, AR/VR ada
+    // 2. KARYAWAN TIF (PJ): Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Daftarkan Teknisi, Import, Export, Audit, AR
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: true },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices" },
+      { id: "modul", label: "Modul", icon: "memory", href: "/modules/" },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations" },
       { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
       { id: "daftarkan-teknisi", label: "Daftarkan Teknisi", icon: "person_add", href: "/auth/register-teknisi" },
@@ -30,10 +32,11 @@ export default function Sidebar({ user }) {
       { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
     ];
   } else if (role === "karyawan_tif" && !isPj) {
-    // 3. KARYAWAN TIF BIASA: Daftarkan Teknisi TIDAK BOLEH tampil, Modul dihapus, AR/VR ada
+    // 3. KARYAWAN TIF BIASA: Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Import, Export, Audit, AR
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: true },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices" },
+      { id: "modul", label: "Modul", icon: "memory", href: "/modules/" },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations" },
       { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
       { id: "import", label: "Import Data", icon: "upload_file", href: "/import/" },
@@ -42,11 +45,11 @@ export default function Sidebar({ user }) {
       { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
     ];
   } else {
-    // 1. ADMIN: Kelola User, Daftarkan Karyawan, Modul, dan AR/VR
+    // 1. ADMIN: Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Kelola User, Daftarkan Karyawan, Import, Export, Audit, AR
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: true },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices" },
-      { id: "modul", label: "Modul", icon: "memory", href: "/device/types" },
+      { id: "modul", label: "Modul", icon: "memory", href: "/modules/" },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations" },
       { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
       { id: "kelola-user", label: "Kelola User", icon: "manage_accounts", href: "/auth/admin/users" },

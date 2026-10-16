@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Modul{% endblock %}
+{% block content %}
+<div class="page page--wide" style="margin:0;padding:0;max-width:none;">
+
+<div class="card" style="margin-bottom:20px;">
+    <h1>Modul (Inventaris Modul)</h1>
+    <p class="subtitle">Daftar unit modul fisik yang terpasang pada perangkat jaringan STO PALU 1 dan STO PALU 2.</p>
+
+    <!-- Filter Bar -->
+    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+            <label for="filter_ne">Filter Perangkat (NE)</label>
+            <select id="filter_ne" name="ne" onchange="this.form.submit()">
+                <option value="">Semua Perangkat Palu</option>
+                {% for dev in palu_devices %}
+                <option value="{{ dev.hostname }}" {% if selected_ne == dev.hostname %}selected{% endif %}>
+                    {{ dev.hostname }} ({{ dev.location.nama_lokasi if dev.location else "-" }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex:1;min-width:200px;">
+            <label for="search_q">Cari (SN / Unit Type / Part Number)</label>
+            <input type="text" id="search_q" name="q" value="{{ search_query }}" placeholder="Contoh: ZJ2108000H9 atau C4ACO">
+        </div>
+        <div style="padding-bottom:1px;">
+            <button type="submit" style="margin-top:0;">Cari</button>
+            {% if selected_ne or search_query or show_all %}
+                <a href="{{ url_for('module_request.inventory') }}" class="btn btn--secondary" style="margin-top:0;margin-left:6px;">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.88rem;color:var(--ink-soft);">
+        <div>
+            Total data ditampilkan: <strong>{{ total_count }}</strong> baris
+            {% if not show_all and not selected_ne %}
+                (Fokus inventaris STO PALU 1 &amp; STO PALU 2)
+            {% endif %}
+        </div>
+        <div>
+            {% if show_all %}
+                <a href="{{ url_for('module_request.inventory') }}" class="btn btn--secondary btn--small">Fokus Inventaris Palu</a>
+            {% else %}
+                <a href="{{ url_for('module_request.inventory', all=1) }}" class="btn btn--secondary btn--small">Tampilkan Semua</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Table of Modules (Strictly 9 Columns matching requirements) -->
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Perangkat (NE)</th>
+                <th>Unit Type</th>
+                <th>Location</th>
+                <th>Port</th>
+                <th>Shelf</th>
+                <th>Slot</th>
+                <th>Unit Part Number</th>
+                <th>Serial Number</th>
+                <th>Date (DD/MM/YYYY)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><strong>{{ item.ne_name }}</strong></td>
+                <td>{{ item.unit_type }}</td>
+                <td>{{ item.location_name }}</td>
+                <td>{{ item.port if item.port else "" }}</td>
+                <td>{{ item.shelf if item.shelf else "" }}</td>
+                <td>{{ item.slot if item.slot else "" }}</td>
+                <td><code>{{ item.unit_part_number if item.unit_part_number else "" }}</code></td>
+                <td><strong>{{ item.serial_number }}</strong></td>
+                <td>{{ item.date_str if item.date_str else "" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align:center;padding:24px;color:var(--ink-soft);">
+                    Tidak ada data modul yang sesuai dengan kriteria filter.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %}
