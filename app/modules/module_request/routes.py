@@ -14,7 +14,7 @@ from flask_login import login_required, current_user
 from ...extensions import db
 from ...models import (
     Device, SlotDefinition, ModuleType, Module, ModulePosition,
-    ModuleRequest, RequestApproval, ModuleMovement, User,
+    ModuleRequest, RequestApproval, ModuleMovement, User, Location,
 )
 from ...utils.decorators import role_required
 from ...utils.hashing import append_audit_log
@@ -305,3 +305,75 @@ def reject_request(request_id):
     db.session.commit()
     flash("Pengajuan ditolak.", "success")
     return redirect(url_for("module_request.list_requests"))
+
+
+# ---------------- Halaman Modul (Tabel Inventaris Modul) ----------------
+
+@module_request_bp.route("/", methods=["GET"])
+@module_request_bp.route("/inventory", methods=["GET"])
+@login_required
+def inventory():
+    """
+    Halaman Modul: menampilkan tabel modul fisik yang terpasang pada perangkat.
+    Kolom: Nama Perangkat (NE), Unit Type, Location, Port, Shelf, Slot,
+           Unit Part Number, Serial Number, Date (DD/MM/YYYY).
+    """
+    ne_filter = request.args.get("ne", "").strip()
+    search_query = request.args.get("q", "").strip()
+    show_all = request.args.get("all", "0") == "1"
+
+    query = (
+        db.session.query(
+            Device.hostname.label("ne_name"),
+            ModuleType.nama_tipe.label("unit_type"),
+            Location.nama_lokasi.label("location_name"),
+            ModulePosition.port.label("port"),
+            ModulePosition.shelf.label("shelf"),
+            SlotDefinition.nomor_slot.label("slot"),
+            Module.unit_part_number.label("unit_part_number"),
+            Module.serial_number.label("serial_number"),
+            Module.original_date.label("date_str"),
+        )
+        .join(ModulePosition, Module.modul_id == ModulePosition.module_id)
+        .join(Device, ModulePosition.device_id == Device.device_id)
+        .join(Location, Device.location_id == Location.location_id)
+        .join(ModuleType, Module.module_type_id == ModuleType.module_type_id)
+        .join(SlotDefinition, ModulePosition.slot_definition_id == SlotDefinition.slot_definition_id)
+        .filter(ModulePosition.status == "aktif")
+    )
+
+    if ne_filter:
+        query = query.filter(Device.hostname == ne_filter)
+    elif not show_all:
+        # Default fokus inventaris modul PSS24 Palu: WN-24X-SUL-PAL11 (STO PALU 1) dan WN-24X-SUL-PAL211 (STO PALU 2)
+        query = query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"]))
+
+    if search_query:
+        query = query.filter(
+            (Module.serial_number.ilike(f"%{search_query}%"))
+            | (ModuleType.nama_tipe.ilike(f"%{search_query}%"))
+            | (Module.unit_part_number.ilike(f"%{search_query}%"))
+            | (Device.hostname.ilike(f"%{search_query}%"))
+        )
+
+    items = query.order_by(
+        Device.hostname.asc(),
+        SlotDefinition.nomor_slot.asc(),
+        ModulePosition.port.asc(),
+    ).all()
+
+    palu_devices = (
+        Device.query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"]))
+        .order_by(Device.hostname)
+        .all()
+    )
+
+    return render_template(
+        "module_request/inventory.html",
+        items=items,
+        total_count=len(items),
+        selected_ne=ne_filter,
+        search_query=search_query,
+        show_all=show_all,
+        palu_devices=palu_devices,
+    )

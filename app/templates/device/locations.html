@@ -5,24 +5,31 @@
 
 <div class="card" style="margin-bottom:20px;">
     <h1>Lokasi</h1>
-    <p class="subtitle">Lokasi fisik tempat perangkat terpasang.</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <p class="subtitle" style="margin:0;">Lokasi fisik tempat perangkat terpasang (Fokus inventaris STO PALU 1 &amp; STO PALU 2).</p>
+        <div>
+            {% if show_all %}
+                <a href="{{ url_for('device.locations') }}" class="btn btn--secondary btn--small">Tampilkan Hanya Lokasi Inventaris</a>
+            {% else %}
+                <a href="{{ url_for('device.locations', all=1) }}" class="btn btn--secondary btn--small">Tampilkan Semua Lokasi</a>
+            {% endif %}
+        </div>
+    </div>
 
     <table>
         <thead>
             <tr>
                 <th>Nama Lokasi</th>
                 <th>District</th>
-                <th>Area</th>
                 <th>Alamat</th>
-                <th>Koordinat</th>
+                <th>Latitude, Longitude</th>
             </tr>
         </thead>
         <tbody>
             {% for l in locations %}
             <tr>
-                <td>{{ l.nama_lokasi }}</td>
-                <td>{{ l.district }}</td>
-                <td>{{ l.area or "-" }}</td>
+                <td><strong>{{ l.nama_lokasi }}</strong></td>
+                <td>{{ l.district or "-" }}</td>
                 <td>{{ l.alamat or "-" }}</td>
                 <td>
                     {% if l.latitude and l.longitude %}
@@ -33,7 +40,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Belum ada lokasi.</td></tr>
+            <tr><td colspan="4">Belum ada lokasi yang sesuai.</td></tr>
             {% endfor %}
         </tbody>
     </table>
