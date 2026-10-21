@@ -1,0 +1,16 @@
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Node.js dependencies
+frontend/node_modules/
+
+# Local environment secrets
+.env
+.env.*
+!.env.example

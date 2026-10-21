@@ -77,7 +77,7 @@ def _apply_approved_request(module_request, actor_user):
 
     movement = ModuleMovement(
         module_id=module_request.module_id,
-        user_id=module_request.requested_by,
+        user_id=actor_user.user_id,
         from_device_id=module_request.from_device_id,
         from_slot_definition_id=module_request.from_slot_definition_id,
         to_device_id=module_request.to_device_id,
@@ -318,6 +318,12 @@ def inventory():
     Kolom: Nama Perangkat (NE), Unit Type, Location, Port, Shelf, Slot,
            Unit Part Number, Serial Number, Date (DD/MM/YYYY).
     """
+    import os
+    from flask import current_app
+    react_template_path = os.path.join(current_app.root_path, "templates", "react_index.html")
+    if os.path.exists(react_template_path) and not request.args.get("legacy"):
+        return render_template("react_index.html", current_user=current_user)
+
     ne_filter = request.args.get("ne", "").strip()
     search_query = request.args.get("q", "").strip()
     show_all = request.args.get("all", "0") == "1"

@@ -1,9 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Export Data{% endblock %}
+{% block title %}Export Riwayat Modul{% endblock %}
 {% block content %}
 <div class="card">
     <h1>Export Riwayat Modul</h1>
-    <p class="subtitle">Filter dulu (opsional), lalu unduh riwayat perpindahan modul sebagai file Excel.</p>
+    <p class="subtitle">
+        Filter riwayat perpindahan modul (opsional), lalu unduh sebagai file Excel.
+        Database saat ini mencatat <strong>{{ total_movements }}</strong> aktivitas riwayat perpindahan modul.
+    </p>
 
     <form method="GET" action="{{ url_for('export.download') }}">
         <label for="location_id">Lokasi</label>
@@ -16,9 +19,17 @@
 
         <label for="device_type_id">Tipe Perangkat</label>
         <select id="device_type_id" name="device_type_id">
-            <option value="">Semua tipe</option>
+            <option value="">Semua tipe perangkat</option>
             {% for t in all_types %}
             <option value="{{ t.device_type_id }}">{{ t.nama_tipe }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="module_type_id">Tipe Modul</label>
+        <select id="module_type_id" name="module_type_id">
+            <option value="">Semua tipe modul</option>
+            {% for mt in all_module_types %}
+            <option value="{{ mt.module_type_id }}">{{ mt.nama_tipe }}</option>
             {% endfor %}
         </select>
 

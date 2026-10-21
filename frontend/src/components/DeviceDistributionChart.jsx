@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
 const PALETTE_DARK = ["#1677FF", "#38BDF8", "#64748B", "#A855F7", "#EC4899"];
-const PALETTE_LIGHT = ["#EE2E24", "#0284C7", "#64748B", "#9333EA", "#E11D48"];
+const PALETTE_LIGHT = ["#1677FF", "#0284C7", "#64748B", "#9333EA", "#0D9488"];
 
 export default function DeviceDistributionChart({ data }) {
   const { isDark } = useTheme();

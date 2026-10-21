@@ -14,6 +14,11 @@ import AvatarModal from "./components/AvatarModal";
 import LogoutModal from "./components/LogoutModal";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ModulesPage from "./pages/ModulesPage";
+import LocationsPage from "./pages/LocationsPage";
+import DevicesPage from "./pages/DevicesPage";
+import ImportPage from "./pages/ImportPage";
+import ExportPage from "./pages/ExportPage";
 
 export default function App() {
   // Simple client-side routing based on pathname
@@ -25,6 +30,12 @@ export default function App() {
     return <RegisterPage />;
   }
 
+  const isModulesPage = path.startsWith("/modules");
+  const isLocationsPage = path.startsWith("/device/locations");
+  const isDevicesPage = path.startsWith("/device/devices") || path === "/devices";
+  const isImportPage = path.startsWith("/import");
+  const isExportPage = path.startsWith("/export");
+
   const { isDark } = useTheme();
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
@@ -32,6 +43,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   // Fetch User Profile
   const fetchUser = async () => {
@@ -71,8 +83,10 @@ export default function App() {
 
   useEffect(() => {
     fetchUser();
-    fetchStats("30d");
-  }, []);
+    if (!isModulesPage && !isLocationsPage && !isDevicesPage && !isImportPage && !isExportPage) {
+      fetchStats("30d");
+    }
+  }, [isModulesPage, isLocationsPage, isDevicesPage, isImportPage, isExportPage]);
 
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);
@@ -87,7 +101,7 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen w-full transition-colors duration-300 ${
+      className={`h-screen w-full flex overflow-hidden transition-colors duration-300 ${
         isDark ? "bg-[#071426] text-[#E6EDF7]" : "bg-slate-50 text-slate-900"
       }`}
     >
@@ -95,53 +109,93 @@ export default function App() {
       <Sidebar user={user} />
 
       {/* Main Layout Area */}
-      <div className="pl-[240px] flex flex-col min-h-screen w-full">
+      <div className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden">
         {/* Top Header with Theme Switcher & Profile */}
         <Header
           user={user}
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
           onOpenLogoutModal={() => setLogoutModalOpen(true)}
           onOpenAvatarModal={() => setAvatarModalOpen(true)}
         />
 
-        {/* Dashboard Main Content */}
-        <main className="mt-[64px] p-6 space-y-5 flex-1 w-full max-w-7xl">
-          {/* Welcome Banner */}
-          <HeroBanner userName={user?.name} userRole={user?.role} />
-
-          {isTeknisi ? (
+        {/* Main Content: Only this area scrolls */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-5 custom-scrollbar">
+          {isModulesPage ? (
             /* ======================================================== */
-            /* DASHBOARD TEKNISI (Sesuai Gambar Referensi & Arahan User) */
+            /* HALAMAN MODUL (REDESIGN SESUAI GAMBAR REFERENSI USER)     */
             /* ======================================================== */
-            <>
-              {/* 4 Kartu Metrik Khusus Teknisi */}
-              <TeknisiKpiCards data={stats?.teknisi} />
-
-              {/* Riwayat Pengajuan Terbaru (Gaya Aktivitas Terbaru) */}
-              <TeknisiRecentRequests requests={stats?.teknisi?.recent_requests} />
-            </>
+            <ModulesPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isLocationsPage ? (
+            /* ======================================================== */
+            /* HALAMAN LOKASI (REDESIGN SESUAI GAMBAR REFERENSI USER)    */
+            /* ======================================================== */
+            <LocationsPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isDevicesPage ? (
+            /* ======================================================== */
+            /* HALAMAN PERANGKAT (REDESIGN SESUAI GAMBAR REFERENSI USER) */
+            /* ======================================================== */
+            <DevicesPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isImportPage ? (
+            /* ======================================================== */
+            /* HALAMAN IMPORT DATA (REDESIGN SESUAI GAMBAR REFERENSI USER)*/
+            /* ======================================================== */
+            <ImportPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isExportPage ? (
+            /* ======================================================== */
+            /* HALAMAN EXPORT DATA (REDESIGN SESUAI GAMBAR REFERENSI USER)*/
+            /* ======================================================== */
+            <ExportPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
           ) : (
             /* ======================================================== */
-            /* DASHBOARD ADMIN & KARYAWAN TIF (Tetap Konsisten)         */
+            /* HALAMAN DASHBOARD UTAMA                                  */
             /* ======================================================== */
             <>
-              {/* KPI Metrics Cards */}
-              <KpiCards kpi={stats?.kpi} />
+              {/* Welcome Banner */}
+              <HeroBanner userName={user?.name} userRole={user?.role} />
 
-              {/* Donut Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <DeviceDistributionChart data={stats?.device_distribution} />
-                <ModuleConditionChart data={stats?.module_conditions} />
-              </div>
-
-              {/* Trend Line Chart */}
-              <MovementTrendChart
-                data={stats?.movement_trend}
-                currentPeriod={period}
-                onPeriodChange={handlePeriodChange}
-              />
-
-              {/* Activity Log */}
-              <RecentActivities activities={stats?.recent_activities} />
+              {isTeknisi ? (
+                /* DASHBOARD TEKNISI */
+                <>
+                  <TeknisiKpiCards data={stats?.teknisi} />
+                  <TeknisiRecentRequests requests={stats?.teknisi?.recent_requests} />
+                </>
+              ) : (
+                /* DASHBOARD ADMIN & KARYAWAN TIF */
+                <>
+                  <KpiCards kpi={stats?.kpi} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <DeviceDistributionChart data={stats?.device_distribution} />
+                    <ModuleConditionChart data={stats?.module_conditions} />
+                  </div>
+                  <MovementTrendChart
+                    data={stats?.movement_trend}
+                    currentPeriod={period}
+                    onPeriodChange={handlePeriodChange}
+                  />
+                  <RecentActivities activities={stats?.recent_activities} />
+                </>
+              )}
             </>
           )}
         </main>

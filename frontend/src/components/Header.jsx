@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 
-export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpenAvatarModal }) {
+export default function Header({
+  user,
+  onAvatarUpdated,
+  onOpenLogoutModal,
+  onOpenAvatarModal,
+  searchValue = "",
+  onSearchChange,
+}) {
   const { theme, toggleTheme, isDark } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -22,7 +29,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
 
   return (
     <header
-      className={`fixed top-0 left-[240px] right-0 h-[64px] z-40 px-6 flex items-center justify-between border-b gap-6 transition-colors duration-300 ${
+      className={`w-full h-[64px] shrink-0 z-40 px-6 flex items-center justify-between border-b gap-6 transition-colors duration-300 ${
         isDark
           ? "bg-[#071426] border-[#1A2E4C] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
           : "bg-white border-slate-200 shadow-sm"
@@ -39,31 +46,34 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
         </span>
         <input
           type="text"
+          value={searchValue}
+          onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
           placeholder="Cari perangkat, modul, lokasi, atau nomor seri..."
           className={`w-full h-10 pl-10 pr-4 rounded-full text-xs transition-all focus:outline-none ${
             isDark
               ? "bg-[#0D1F36] border border-[#1E3A5F] text-[#E6EDF7] placeholder:text-[#64748B] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-              : "bg-slate-100 border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-[#EE2E24] focus:ring-1 focus:ring-[#EE2E24]"
+              : "bg-slate-100 border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
           }`}
         />
       </div>
 
       {/* Right Action Items */}
       <div className="flex items-center gap-4 relative shrink-0">
-        {/* THEME SWITCHER: Dark Mode / Light Mode (Merah-Putih Telkom) */}
+
+        {/* THEME SWITCHER: Dark Mode / Light Mode */}
         <div className="relative">
           <button
             type="button"
             onClick={toggleTheme}
             title={
               isDark
-                ? "Beralih ke Tema Terang (Merah-Putih Telkom)"
-                : "Beralih ke Tema Gelap (Navy)"
+                ? "Beralih ke Tema Terang"
+                : "Beralih ke Tema Gelap"
             }
             className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 border cursor-pointer group ${
               isDark
                 ? "bg-[#0D1F36] border-[#1E3A5F] text-amber-400 hover:border-amber-400/50 hover:bg-[#122846] shadow-sm hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]"
-                : "bg-red-50 border-red-200 text-[#EE2E24] hover:bg-red-100 shadow-sm hover:shadow-[0_0_12px_rgba(238,46,36,0.2)]"
+                : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-amber-500 shadow-sm hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]"
             }`}
           >
             {isDark ? (
@@ -80,7 +90,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
               className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 ${
                 isDark
                   ? "bg-amber-400 ring-[#071426]"
-                  : "bg-[#EE2E24] ring-white"
+                  : "bg-amber-400 ring-white"
               }`}
             ></span>
           </button>
@@ -103,9 +113,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
               <img
                 src={avatarSrc}
                 alt={user?.name || "User Avatar"}
-                className={`w-9 h-9 rounded-full object-cover ring-2 shadow-sm ${
-                  isDark ? "ring-[#1677FF]" : "ring-[#EE2E24]"
-                }`}
+                className="w-9 h-9 rounded-full object-cover ring-2 shadow-sm ring-[#1677FF]"
               />
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
             </div>
@@ -128,7 +136,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
               </div>
               <span
                 className={`text-[11px] leading-none mt-0.5 capitalize ${
-                  isDark ? "text-[#38BDF8]" : "text-[#EE2E24]"
+                  isDark ? "text-[#38BDF8]" : "text-blue-600"
                 }`}
               >
                 {user?.role?.replace("_", " ") || "Admin"}
@@ -139,7 +147,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
           {/* User Profile Dropdown Card */}
           {dropdownOpen && (
             <div
-              className={`absolute right-0 top-12 mt-2 w-[320px] rounded-2xl shadow-2xl p-5 z-50 border backdrop-blur-md transition-all duration-200 ${
+              className={`absolute right-0 top-12 mt-2 w-[340px] rounded-2xl shadow-2xl p-5 z-50 border backdrop-blur-md transition-all duration-200 ${
                 isDark
                   ? "bg-[#0D1F36]/95 border-[#1E3653] text-[#E6EDF7]"
                   : "bg-white/95 border-slate-200 text-slate-800 shadow-slate-200"
@@ -155,9 +163,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
                   <img
                     src={avatarSrc}
                     alt={user?.name}
-                    className={`w-12 h-12 rounded-full object-cover ring-2 shadow-md ${
-                      isDark ? "ring-[#1677FF]/50" : "ring-[#EE2E24]/50"
-                    }`}
+                    className="w-12 h-12 rounded-full object-cover ring-2 shadow-md ring-[#1677FF]/40"
                   />
                   {/* Camera action button */}
                   <button
@@ -167,11 +173,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
                       onOpenAvatarModal();
                     }}
                     title="Ubah Foto Profil (Kamera / Galeri)"
-                    className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-md border transition-transform hover:scale-110 cursor-pointer ${
-                      isDark
-                        ? "bg-[#1677FF] hover:bg-[#38BDF8] border-[#071426]"
-                        : "bg-[#EE2E24] hover:bg-[#D31F17] border-white"
-                    }`}
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-md border transition-transform hover:scale-110 cursor-pointer bg-[#1677FF] hover:bg-[#38BDF8] border-white"
                   >
                     <span className="material-symbols-outlined text-[13px]">
                       photo_camera
@@ -188,7 +190,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
                   </h4>
                   <p
                     className={`text-[11px] font-medium leading-tight mt-0.5 capitalize ${
-                      isDark ? "text-[#38BDF8]" : "text-[#EE2E24]"
+                      isDark ? "text-[#38BDF8]" : "text-blue-600"
                     }`}
                   >
                     {user?.role?.replace("_", " ")}
@@ -238,7 +240,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
                     </span>
                     <span
                       className={`font-mono text-right truncate text-[11px] ${
-                        isDark ? "text-[#38BDF8]" : "text-[#EE2E24]"
+                        isDark ? "text-[#38BDF8]" : "text-blue-600"
                       }`}
                     >
                       {user?.email}
@@ -262,7 +264,7 @@ export default function Header({ user, onAvatarUpdated, onOpenLogoutModal, onOpe
                   className={`rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition-colors cursor-pointer border ${
                     isDark
                       ? "bg-[#1677FF]/15 text-[#38BDF8] border-[#1677FF]/30 hover:bg-[#1677FF]/25"
-                      : "bg-red-50 text-[#EE2E24] border-red-200 hover:bg-red-100"
+                      : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
                   }`}
                 >
                   <span className="material-symbols-outlined text-[16px]">

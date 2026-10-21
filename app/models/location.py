@@ -12,7 +12,9 @@ class Location(db.Model):
     area = db.Column(db.String(100))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    import_id = db.Column(db.Integer, db.ForeignKey("data_imports.import_id", ondelete="SET NULL"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     devices = db.relationship("Device", backref="location")
+    data_import = db.relationship("DataImport", back_populates="locations")

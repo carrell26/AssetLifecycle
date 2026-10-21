@@ -52,8 +52,8 @@ export default function MovementTrendChart({ data, onPeriodChange, currentPeriod
     ? `${pathD} L ${coords[coords.length - 1].x} ${baseline} L ${coords[0].x} ${baseline} Z`
     : "";
 
-  const strokeColor = isDark ? "#1677FF" : "#EE2E24";
-  const pointHaloColor = isDark ? "#38BDF8" : "#EE2E24";
+  const strokeColor = "#1677FF";
+  const pointHaloColor = isDark ? "#38BDF8" : "#3B82F6";
 
   return (
     <div
@@ -76,7 +76,7 @@ export default function MovementTrendChart({ data, onPeriodChange, currentPeriod
               className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${
                 isDark
                   ? "bg-[#1677FF]/15 text-[#38BDF8] border-[#1677FF]/30"
-                  : "bg-red-50 text-[#EE2E24] border-red-200"
+                  : "bg-blue-50 text-blue-600 border-blue-200"
               }`}
             >
               Module Movements &amp; Requests
@@ -110,7 +110,7 @@ export default function MovementTrendChart({ data, onPeriodChange, currentPeriod
               activeStyle = "bg-[#1677FF] text-[#E6EDF7] shadow-sm shadow-[#1677FF]/40 font-semibold";
               inactiveStyle = "text-[#94A3B8] hover:text-[#E6EDF7]";
             } else {
-              activeStyle = "bg-[#EE2E24] text-white shadow-sm shadow-[#EE2E24]/30 font-semibold";
+              activeStyle = "bg-[#1677FF] text-white shadow-sm shadow-[#1677FF]/30 font-semibold";
               inactiveStyle = "text-slate-600 hover:text-slate-900";
             }
 
