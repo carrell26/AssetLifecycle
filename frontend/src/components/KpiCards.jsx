@@ -17,12 +17,12 @@ export default function KpiCards({ kpi }) {
         className={`rounded-2xl p-4 border shadow-sm relative overflow-hidden flex flex-col justify-between group cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
           isDark
             ? "bg-[#0D1F36] border-[#1E3A5F] hover:border-[#1677FF] hover:shadow-[0_10px_25px_rgba(22,119,255,0.25)] text-[#E6EDF7]"
-            : "bg-white border-slate-200 hover:border-[#EE2E24] hover:shadow-[0_10px_25px_rgba(238,46,36,0.15)] text-slate-900"
+            : "bg-white border-slate-200 hover:border-blue-500 hover:shadow-[0_10px_25px_rgba(22,119,255,0.15)] text-slate-900"
         }`}
       >
         <div
           className={`absolute -top-8 -right-8 w-28 h-28 rounded-full blur-2xl pointer-events-none transition-opacity opacity-40 group-hover:opacity-80 ${
-            isDark ? "bg-[#1677FF]/30" : "bg-[#EE2E24]/20"
+            isDark ? "bg-[#1677FF]/30" : "bg-[#1677FF]/15"
           }`}
         ></div>
         <div className="flex items-start justify-between relative z-10">
@@ -30,7 +30,7 @@ export default function KpiCards({ kpi }) {
             <div className="flex items-center gap-1.5">
               <span
                 className={`w-2 h-2 rounded-full pulse-glow ${
-                  isDark ? "bg-[#1677FF]" : "bg-[#EE2E24]"
+                  isDark ? "bg-[#1677FF]" : "bg-blue-500"
                 }`}
               ></span>
               <span
@@ -45,7 +45,7 @@ export default function KpiCards({ kpi }) {
               <span>{totalDevices}</span>
               <span
                 className={`text-[11px] font-normal ${
-                  isDark ? "text-[#38BDF8]" : "text-[#EE2E24]"
+                  isDark ? "text-[#38BDF8]" : "text-blue-600"
                 }`}
               >
                 Unit
@@ -56,7 +56,7 @@ export default function KpiCards({ kpi }) {
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm border transition-all duration-300 ${
               isDark
                 ? "bg-[#1677FF]/15 border-[#1677FF]/40 text-[#38BDF8] group-hover:border-[#38BDF8]"
-                : "bg-red-50 border-red-200 text-[#EE2E24] group-hover:bg-[#EE2E24] group-hover:text-white"
+                : "bg-blue-50 border-blue-200 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
             }`}
           >
             <span className="material-symbols-outlined text-[23px]">router</span>
@@ -77,7 +77,7 @@ export default function KpiCards({ kpi }) {
               <span>Kapasitas Rak</span>
               <span
                 className={`font-semibold ${
-                  isDark ? "text-[#38BDF8]" : "text-[#EE2E24]"
+                  isDark ? "text-[#38BDF8]" : "text-blue-600"
                 }`}
               >
                 84%
@@ -94,7 +94,7 @@ export default function KpiCards({ kpi }) {
                 className={`h-full rounded-full transition-all duration-500 ${
                   isDark
                     ? "bg-gradient-to-r from-[#1677FF] to-[#38BDF8]"
-                    : "bg-gradient-to-r from-[#EE2E24] to-red-400"
+                    : "bg-gradient-to-r from-[#1677FF] to-blue-400"
                 }`}
                 style={{ width: "84%" }}
               ></div>

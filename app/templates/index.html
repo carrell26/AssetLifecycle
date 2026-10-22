@@ -97,36 +97,48 @@
           <span class="material-symbols-outlined text-[19px]">dashboard</span>
           <span class="">Dashboard</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span class="">Pengajuan Perpindahan</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span class="">AR/VR</span>
-        </a>
-      {% elif current_user.role == 'karyawan_tif' and current_user.is_pj %}
-        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
-          <span class="material-symbols-outlined text-[19px]">dashboard</span>
-          <span class="">Dashboard</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_devices') }}">
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.devices') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
           <span class="">Perangkat</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_locations') }}">
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.inventory') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span class="">Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.locations') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
           <span class="">Lokasi</span>
         </a>
         <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span class="">Pengajuan Modul</span>
+          <span class="">Mutasi Modul</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.register_teknisi') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">person_add</span>
-          <span class="">Daftarkan Teknisi</span>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.scan') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
+          <span class="">Scan</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
+      {% elif current_user.role == 'karyawan_tif' %}
+        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
+          <span class="material-symbols-outlined text-[19px]">dashboard</span>
+          <span class="">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.devices') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span class="">Perangkat</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.inventory') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span class="">Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.locations') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span class="">Lokasi</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
+          <span class="">Mutasi Modul</span>
+        </a>
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.index') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
           <span class="">Import Data</span>
         </a>
@@ -134,46 +146,13 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
           <span class="">Export Data</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.list_logs') }}">
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.logs') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
           <span class="">Audit Log</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.scan') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span class="">AR/VR</span>
-        </a>
-      {% elif current_user.role == 'karyawan_tif' and not current_user.is_pj %}
-        <a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1677FF] text-[#E6EDF7] text-[13px] font-medium transition-colors shadow-lg shadow-[#1677FF]/25" href="{{ url_for('index') }}">
-          <span class="material-symbols-outlined text-[19px]">dashboard</span>
-          <span class="">Dashboard</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_devices') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
-          <span class="">Perangkat</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('device.list_locations') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
-          <span class="">Lokasi</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span class="">Pengajuan Modul</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
-          <span class="">Import Data</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('export.index') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
-          <span class="">Export Data</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('audit.list_logs') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
-          <span class="">Audit Log</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span class="">AR/VR</span>
+          <span class="">Scan</span>
         </a>
       {% else %}
         <!-- Admin -->
@@ -195,15 +174,11 @@
         </a>
         <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('module_request.list_requests') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span class="">Pengajuan Modul</span>
+          <span class="">Mutasi Modul</span>
         </a>
         <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.manage_users') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">manage_accounts</span>
           <span class="">Kelola User</span>
-        </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('auth.register_karyawan') }}">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">badge</span>
-          <span class="">Daftarkan Karyawan</span>
         </a>
         <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('data_import.import_page') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
@@ -217,9 +192,9 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
           <span class="">Audit Log</span>
         </a>
-        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.index') }}">
+        <a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-[#E6EDF7] text-[13px] font-medium hover:bg-[#0D1F36] transition-colors" href="{{ url_for('ar.scan') }}">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span class="">AR/VR</span>
+          <span class="">Scan</span>
         </a>
       {% endif %}
     </nav>
@@ -237,130 +212,26 @@
     </div>
     <!-- Right Action Items -->
     <div class="flex items-center gap-4 relative">
-      <!-- Notification Bell Button & Flyout Panel Container -->
-      <div class="relative" id="notification-menu-container">
-        <button aria-expanded="false" aria-haspopup="true" class="relative w-10 h-10 flex items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#0D1F36] hover:text-[#E6EDF7] border border-transparent hover:border-[#1E3A5F] transition-colors cursor-pointer" id="notification-button" onclick="toggleNotificationPanel()" title="Notifikasi" type="button">
-          <span class="material-symbols-outlined text-[22px]">notifications</span>
-          <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#1677FF] ring-2 ring-[#071426]" id="notification-badge"></span>
-        </button>
-        <!-- Interactive Notification Flyout Panel Dropdown -->
-        <div class="absolute right-0 top-12 mt-2 w-[390px] rounded-xl bg-[#0D1F36]/95 backdrop-blur-md border border-[#1E3653] shadow-2xl z-50 transition-all duration-200 transform origin-top-right overflow-hidden flex flex-col hidden opacity-0 scale-95" id="notification-panel">
-          <div class="px-4 py-3.5 border-b border-[#1A2E4C] flex items-center justify-between bg-[#071426]/70">
-            <div class="flex items-center gap-2">
-              <h3 class="text-sm font-semibold text-[#E6EDF7]">Notifikasi</h3>
-              <span class="px-2 py-0.5 text-[10px] font-semibold bg-[#1677FF]/20 text-[#38BDF8] border border-[#1677FF]/40 rounded-full">3 Baru</span>
-            </div>
-            <button class="text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1 hover:underline text-[#94A3B8]" id="mark-all-read-btn"><span class="material-symbols-outlined text-[14px]">done_all</span> Semua Dibaca</button>
-          </div>
-          <div class="px-3 py-2 bg-[#0A172A] border-b border-[#1A2E4C] flex items-center gap-1.5 overflow-x-auto whitespace-nowrap" id="notif-filter-group"><button class="notif-tab shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#1677FF] text-[#E6EDF7] border border-transparent shadow-sm transition-all cursor-pointer" data-filter="all" onclick="filterNotifications('all', this)">Semua (5)</button>
-  <button class="notif-tab shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#122846] border border-transparent hover:border-[#1E3A5F] transition-all cursor-pointer" data-filter="approval" onclick="filterNotifications('approval', this)">Persetujuan (2)</button>
-  <button class="notif-tab shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#122846] border border-transparent hover:border-[#1E3A5F] transition-all cursor-pointer" data-filter="system" onclick="filterNotifications('system', this)">Sistem (3)</button></div>
-          <div class="max-h-[380px] overflow-y-auto divide-y divide-[#1A2E4C]/60 custom-scrollbar" id="notif-list"><!-- Item 1 (approval) -->
-<div class="p-3.5 hover:bg-[#122846]/60 transition-colors relative flex items-start gap-3 group cursor-pointer notif-item" data-category="approval">
-  <div class="w-8 h-8 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-    <span class="material-symbols-outlined text-[17px]">assignment</span>
-  </div>
-  <div class="flex-1 min-w-0 pr-4">
-    <p class="text-xs font-semibold text-[#E6EDF7] truncate">Pengajuan Modul Baru (PSS24-003)</p>
-    <p class="text-[11px] text-[#94A3B8] mt-0.5 leading-relaxed">Teknisi mengajukan mutasi modul di STO Palu 1. Menunggu approval PJ.</p>
-    <div class="flex items-center justify-between mt-2 pt-1">
-      <span class="text-[10px] text-[#64748B] font-mono flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]">schedule</span> 10 menit yang lalu
-      </span>
-      <div class="flex items-center gap-1.5">
-        <button class="px-2 py-0.5 bg-[#1677FF]/20 hover:bg-[#1677FF] text-[#38BDF8] hover:text-[#E6EDF7] border border-[#1677FF]/40 text-[10px] font-medium rounded transition-colors" type="button">Review</button>
-        <button class="px-2 py-0.5 bg-[#071426] hover:bg-[#1E3A5F] text-[#94A3B8] hover:text-[#E6EDF7] border border-[#1A2E4C] text-[10px] font-medium rounded transition-colors" type="button">Detail</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Item 2 (system) -->
-<div class="p-3.5 hover:bg-[#122846]/60 transition-colors relative flex items-start gap-3 group cursor-pointer notif-item" data-category="system">
-  <div class="w-8 h-8 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
-    <span class="material-symbols-outlined text-[17px]">warning</span>
-  </div>
-  <div class="flex-1 min-w-0 pr-4">
-    <p class="text-xs font-semibold text-[#E6EDF7] truncate">Peringatan Kerusakan Modul</p>
-    <p class="text-[11px] text-[#94A3B8] mt-0.5 leading-relaxed">Modul PSS24-002 pada Slot #04 terdeteksi offline / rusak.</p>
-    <div class="flex items-center justify-between mt-2 pt-1">
-      <span class="text-[10px] text-[#64748B] font-mono flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]">schedule</span> 1 jam yang lalu
-      </span>
-      <button class="px-2 py-0.5 bg-rose-500/15 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/30 text-[10px] font-medium rounded transition-colors" type="button">Investigasi</button>
-    </div>
-  </div>
-</div>
-<!-- Item 3 (system) -->
-<div class="p-3.5 hover:bg-[#122846]/60 transition-colors relative flex items-start gap-3 group cursor-pointer notif-item" data-category="system">
-  <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-    <span class="material-symbols-outlined text-[17px]">verified_user</span>
-  </div>
-  <div class="flex-1 min-w-0 pr-4">
-    <p class="text-xs font-semibold text-[#E6EDF7] truncate">Integritas Ledger Terverifikasi</p>
-    <p class="text-[11px] text-[#94A3B8] mt-0.5 leading-relaxed">Pengecekan hash chain SHA-256 berhasil (100% konsisten).</p>
-    <div class="flex items-center justify-between mt-2 pt-1">
-      <span class="text-[10px] text-[#64748B] font-mono flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]">schedule</span> 3 jam yang lalu
-      </span>
-      <span class="text-[10px] text-emerald-400 font-mono font-medium">Blok #4812</span>
-    </div>
-  </div>
-</div>
-<!-- Item 4 (system) -->
-<div class="p-3.5 hover:bg-[#122846]/60 transition-colors relative flex items-start gap-3 group cursor-pointer notif-item" data-category="system">
-  <div class="w-8 h-8 rounded-full bg-[#1677FF]/15 border border-[#1677FF]/30 text-[#38BDF8] flex items-center justify-center shrink-0 mt-0.5">
-    <span class="material-symbols-outlined text-[17px]">upload_file</span>
-  </div>
-  <div class="flex-1 min-w-0 pr-4">
-    <p class="text-xs font-semibold text-[#E6EDF7] truncate">Import Data Selesai</p>
-    <p class="text-[11px] text-[#94A3B8] mt-0.5 leading-relaxed">Sinkronisasi 29 data perangkat telah dimasukkan ke dalam basis data.</p>
-    <div class="flex items-center justify-between mt-2 pt-1">
-      <span class="text-[10px] text-[#64748B] font-mono flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]">schedule</span> 5 jam yang lalu
-      </span>
-      <span class="text-[10px] text-[#38BDF8] font-mono font-medium">29 Data</span>
-    </div>
-  </div>
-</div>
-<!-- Item 5 (approval) -->
-<div class="p-3.5 hover:bg-[#122846]/60 transition-colors relative flex items-start gap-3 group cursor-pointer notif-item" data-category="approval">
-  <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-    <span class="material-symbols-outlined text-[17px]">check_circle</span>
-  </div>
-  <div class="flex-1 min-w-0 pr-4">
-    <p class="text-xs font-semibold text-[#E6EDF7] truncate">Pengajuan Disetujui</p>
-    <p class="text-[11px] text-[#94A3B8] mt-0.5 leading-relaxed">Mutasi modul Metro-002 Port 4 telah disetujui oleh Supervisor.</p>
-    <div class="flex items-center justify-between mt-2 pt-1">
-      <span class="text-[10px] text-[#64748B] font-mono flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]">schedule</span> 1 hari yang lalu
-      </span>
-      <span class="text-[10px] text-emerald-400 font-mono font-medium">Disetujui</span>
-    </div>
-  </div>
-</div></div>
-        </div>
-      </div>
-      <div class="h-5 w-px bg-[#1A2E4C]"></div>
       <!-- User Profile -->
       <div class="relative flex items-center gap-2.5 h-10" id="profile-menu-container">
         <button aria-expanded="false" aria-haspopup="true" class="flex items-center gap-2.5 cursor-pointer text-left focus:outline-none p-1 rounded-full hover:bg-[#0D1F36] transition-colors" id="profileTriggerBtn" onclick="toggleProfileDropdown()" type="button">
           <div class="relative shrink-0">
-            <img alt="Chatrin Aurelia" class="w-9 h-9 rounded-full object-cover ring-2 ring-[#1677FF] shadow-sm" id="header-avatar-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK">
+            <img alt="{{ current_user.name }}" class="w-9 h-9 rounded-full object-cover ring-2 ring-[#1677FF] shadow-sm" id="header-avatar-img" src="{{ current_user.avatar_url or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}">
             <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#10B981] ring-2 ring-[#071426]" title="Status Online"></span>
           </div>
           <div class="flex flex-col text-left justify-center min-w-0">
             <div class="flex items-center gap-1 leading-tight">
-              <span class="text-xs font-semibold text-[#E6EDF7]">Chatrin Aurelia</span>
+              <span class="text-xs font-semibold text-[#E6EDF7]">{{ current_user.name }}</span>
               <span class="material-symbols-outlined text-[17px] text-[#94A3B8] transition-transform duration-200 shrink-0" id="profile-chevron">expand_more</span>
             </div>
-            <span class="text-[11px] text-[#94A3B8] leading-none mt-0.5">Admin</span>
+            <span class="text-[11px] text-[#94A3B8] leading-none mt-0.5 capitalize">{{ current_user.role|replace('_', ' ') }}</span>
           </div>
         </button>
         <div class="absolute right-0 top-12 mt-2 w-[340px] bg-[#0D1F36]/95 border border-[#1E3653] rounded-2xl shadow-2xl p-5 z-50 backdrop-blur-md transition-all duration-200 transform origin-top-right flex flex-col hidden opacity-0 scale-95" id="userProfileDropdown">
           <div class="flex items-center gap-3.5 pb-4 border-b border-[#1A2E4C] relative">
             <div class="relative group" id="avatarMenuWrapper">
-              <img alt="Chatrin Aurelia" class="w-12 h-12 rounded-full object-cover ring-2 ring-[#1677FF]/40 shadow-md" id="profile-card-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK">
-              <button aria-label="Ubah Foto Profil" class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1677FF] hover:bg-[#38BDF8] text-white flex items-center justify-center shadow-md border border-[#071426] transition-transform hover:scale-110 cursor-pointer" id="changeAvatarBtn" onclick="toggleAvatarMenu(event)" title="Ubah Foto Profil" type="button">
+              <img alt="{{ current_user.name }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-[#1677FF]/40 shadow-md" id="profile-card-avatar" src="{{ current_user.avatar_url or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}">
+              <button aria-label="Ubah Foto Profil" class="avatar-camera-btn absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1677FF] hover:bg-[#38BDF8] text-white flex items-center justify-center shadow-md border border-[#071426] transition-transform hover:scale-110 cursor-pointer" id="changeAvatarBtn" onclick="toggleAvatarMenu(event)" title="Ubah Foto Profil" type="button">
                 <span class="material-symbols-outlined text-[13px]">photo_camera</span>
               </button>
               <div class="absolute left-0 top-12 mt-1 w-36 bg-[#0D1F36] border border-[#1E3653] rounded-xl shadow-2xl p-1.5 z-50 transition-all duration-150 flex flex-col space-y-1 hidden opacity-0 scale-95" id="avatarUploadPopover">
@@ -375,29 +246,29 @@
               </div>
             </div>
             <div class="flex flex-col min-w-0 flex-1">
-              <h4 class="text-sm font-semibold text-[#E6EDF7] truncate">Chatrin Aurelia</h4>
-              <p class="text-[11px] text-[#38BDF8] font-medium leading-tight mt-0.5">Admin</p>
+              <h4 class="text-sm font-semibold text-[#E6EDF7] truncate">{{ current_user.name }}</h4>
+              <p class="text-[11px] text-[#38BDF8] font-medium leading-tight mt-0.5 capitalize">{{ current_user.role|replace('_', ' ') }}</p>
             </div>
           </div>
           <div class="py-3.5 space-y-2.5">
             <span class="text-[10px] font-semibold text-[#94A3B8] tracking-wide uppercase font-mono">Informasi Akun</span>
             <div class="bg-[#071426] rounded-xl p-3 border border-[#1A2E4C] space-y-2 text-xs">
               <div class="flex items-start justify-between gap-2">
-                <span class="text-[#94A3B8] text-[11px] shrink-0">Jabatan</span>
-                <span class="font-medium text-[#E6EDF7] text-right truncate text-[11px]">Admin</span>
-              </div>
-              <div class="flex items-start justify-between gap-2">
-                <span class="text-[#94A3B8] text-[11px] shrink-0">Regional</span>
-                <span class="font-medium text-[#E6EDF7] text-right truncate text-[11px]">Witel Donggala / Palu</span>
+                <span class="text-[#94A3B8] text-[11px] shrink-0">District</span>
+                <span class="font-medium text-[#E6EDF7] text-right truncate text-[11px]">{{ current_user.district or "—" }}</span>
               </div>
               <div class="flex items-start justify-between gap-2 pt-1 border-t border-[#1A2E4C]/60">
                 <span class="text-[#94A3B8] text-[11px] shrink-0">Email</span>
-                <span class="font-mono text-[#38BDF8] text-right truncate text-[11px]">chatrin.aurelia@telkom.co.id</span>
+                <span class="font-mono text-[#38BDF8] text-right truncate text-[11px]">{{ current_user.email }}</span>
               </div>
             </div>
           </div>
           <div class="pt-3 border-t border-[#1A2E4C] flex flex-col gap-2">
-            <button class="text-rose-400 bg-rose-500/15 hover:bg-rose-500 hover:text-white border border-rose-500/30 rounded-xl px-4 py-2.5 w-full flex items-center justify-center gap-2 font-medium text-xs transition duration-200 cursor-pointer shadow-sm active:scale-[0.98]" onclick="openLogoutModal()" type="button">
+            <button type="button" onclick="toggleAvatarMenu(event)" class="btn-change-avatar rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition-colors cursor-pointer border bg-[#1677FF]/15 text-[#38BDF8] border-[#1677FF]/30 hover:bg-[#1677FF]/25">
+              <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+              Ganti Foto Profil
+            </button>
+            <button class="btn-logout text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/25 rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition duration-200 cursor-pointer shadow-sm active:scale-[0.98]" onclick="openLogoutModal()" type="button">
               <span class="material-symbols-outlined text-[16px]">logout</span> Keluar dari akun
             </button>
             <div class="text-[11px] text-center text-[#10B981] font-medium hidden mt-1" id="avatar-success-msg"><span class="material-symbols-outlined text-[13px] align-middle mr-0.5">check_circle</span> Foto profil berhasil diperbarui!</div>
@@ -1163,28 +1034,6 @@
     tooltip.classList.add('opacity-0', 'translate-y-1');
   }
 
-  /* Notification dropdown and Profile interactions */
-  function toggleNotificationPanel(forceState) {
-    const panel = document.getElementById('notification-panel');
-    const btn = document.getElementById('notification-button');
-    if (!panel || !btn) return;
-    const isCurrentlyOpen = !panel.classList.contains('hidden');
-    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
-
-    if (shouldOpen) {
-      if (typeof toggleProfileDropdown === 'function') {
-        toggleProfileDropdown(false);
-      }
-      panel.classList.remove('hidden', 'opacity-0', 'scale-95');
-      panel.classList.add('opacity-100', 'scale-100');
-      btn.setAttribute('aria-expanded', 'true');
-    } else {
-      panel.classList.add('hidden', 'opacity-0', 'scale-95');
-      panel.classList.remove('opacity-100', 'scale-100');
-      btn.setAttribute('aria-expanded', 'false');
-    }
-  }
-
   function toggleProfileDropdown(forceState) {
     const menu = document.getElementById('userProfileDropdown');
     const btn = document.getElementById('profileTriggerBtn');
@@ -1193,9 +1042,6 @@
     const isCurrentlyOpen = !menu.classList.contains('hidden');
     const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
     if (shouldOpen) {
-      if (typeof toggleNotificationPanel === 'function') {
-        toggleNotificationPanel(false);
-      }
       menu.classList.remove('hidden', 'opacity-0', 'scale-95');
       menu.classList.add('opacity-100', 'scale-100');
       btn.setAttribute('aria-expanded', 'true');
@@ -1390,7 +1236,6 @@
 
   document.addEventListener('click', function(e) {
     const profileContainer = document.getElementById('profile-menu-container');
-    const notifContainer = document.getElementById('notification-menu-container');
     const avatarWrapper = document.getElementById('avatarMenuWrapper');
 
     if (avatarWrapper && !avatarWrapper.contains(e.target)) {
@@ -1399,56 +1244,14 @@
     if (profileContainer && !profileContainer.contains(e.target)) {
       toggleProfileDropdown(false);
     }
-    if (notifContainer && !notifContainer.contains(e.target)) {
-      toggleNotificationPanel(false);
-    }
   });
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       closeAvatarMenu();
       toggleProfileDropdown(false);
-      toggleNotificationPanel(false);
       closeLogoutModal();
       closeCameraModal();
     }
   });
-</script>
-
-
-
-<script class="">
-  function filterNotifications(category, btnEl) {
-    var tabs = document.querySelectorAll('#notif-filter-group .notif-tab');
-    tabs.forEach(function(tab) {
-      tab.className = 'notif-tab shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#122846] border border-transparent hover:border-[#1E3A5F] transition-all cursor-pointer';
-    });
-    if (btnEl) {
-      btnEl.className = 'notif-tab shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#1677FF] text-[#E6EDF7] border border-transparent shadow-sm transition-all cursor-pointer';
-    }
-    var items = document.querySelectorAll('#notif-list .notif-item');
-    items.forEach(function(item) {
-      var itemCategory = item.getAttribute('data-category');
-      if (category === 'all' || itemCategory === category) {
-        item.classList.remove('hidden');
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-  }
-  window.filterNotifications = filterNotifications;
-
-  var markReadBtn = document.getElementById('mark-all-read-btn');
-  if (markReadBtn) {
-    markReadBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      var badge = document.getElementById('notification-badge');
-      if (badge) badge.classList.add('hidden');
-      var newCountPill = document.querySelector('#notification-panel h3 + span');
-      if (newCountPill) {
-        newCountPill.textContent = '0 Baru';
-        newCountPill.className = 'px-2 py-0.5 text-[10px] font-semibold bg-[#475569]/20 text-[#94A3B8] border border-[#475569]/30 rounded-full';
-      }
-    });
-  }
 </script></body></html>

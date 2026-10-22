@@ -87,16 +87,27 @@
 }
 
 /* ============================================================
-   DARK INPUT AUTOFILL & CUSTOM CHECKBOX (MENCEGAH KOTAK PUTIH)
+   INPUT AUTOFILL (DARK & LIGHT)
    ============================================================ */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px #0D1F36 inset !important;
   -webkit-text-fill-color: #E6EDF7 !important;
   caret-color: #E6EDF7 !important;
   border-color: #162B48 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+html:not(.dark) input:-webkit-autofill,
+html:not(.dark) input:-webkit-autofill:hover,
+html:not(.dark) input:-webkit-autofill:focus,
+html:not(.dark) input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+  -webkit-text-fill-color: #0F172A !important;
+  caret-color: #0F172A !important;
+  border-color: #CBD5E1 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -145,4 +156,401 @@ input:-webkit-autofill:active {
   outline: none;
   box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.35);
 }
+
+/* ============================================================
+   SIDEBAR PRESERVATION: ALWAYS DARK NAVY IN ALL THEMES
+   ============================================================ */
+aside.app-sidebar,
+html:not(.dark) aside.app-sidebar,
+html.dark aside.app-sidebar {
+  background-color: #071426 !important;
+  border-color: #1A2E4C !important;
+  color: #E6EDF7 !important;
+}
+
+aside.app-sidebar .sidebar-header,
+html:not(.dark) aside.app-sidebar .sidebar-header,
+html.dark aside.app-sidebar .sidebar-header {
+  background-color: #071426 !important;
+  border-color: #1A2E4C !important;
+}
+
+aside.app-sidebar .sidebar-logo-text,
+html:not(.dark) aside.app-sidebar .sidebar-logo-text,
+html.dark aside.app-sidebar .sidebar-logo-text {
+  color: #E6EDF7 !important;
+}
+
+aside.app-sidebar .sidebar-sublogo-text,
+html:not(.dark) aside.app-sidebar .sidebar-sublogo-text,
+html.dark aside.app-sidebar .sidebar-sublogo-text {
+  color: #38BDF8 !important;
+}
+
+aside.app-sidebar .sidebar-link-active,
+html:not(.dark) aside.app-sidebar .sidebar-link-active,
+html.dark aside.app-sidebar .sidebar-link-active {
+  background-color: #1677FF !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 15px -3px rgba(22, 119, 255, 0.25) !important;
+}
+
+aside.app-sidebar .sidebar-link-active span,
+html:not(.dark) aside.app-sidebar .sidebar-link-active span,
+html.dark aside.app-sidebar .sidebar-link-active span {
+  color: #FFFFFF !important;
+}
+
+aside.app-sidebar .sidebar-link-inactive,
+html:not(.dark) aside.app-sidebar .sidebar-link-inactive,
+html.dark aside.app-sidebar .sidebar-link-inactive {
+  color: #94A3B8 !important;
+  background-color: transparent !important;
+}
+
+aside.app-sidebar .sidebar-link-inactive:hover,
+html:not(.dark) aside.app-sidebar .sidebar-link-inactive:hover,
+html.dark aside.app-sidebar .sidebar-link-inactive:hover {
+  background-color: #0D1F36 !important;
+  color: #E6EDF7 !important;
+}
+
+aside.app-sidebar .sidebar-link-inactive span,
+html:not(.dark) aside.app-sidebar .sidebar-link-inactive span,
+html.dark aside.app-sidebar .sidebar-link-inactive span {
+  color: #64748B !important;
+}
+
+aside.app-sidebar .sidebar-link-inactive:hover span,
+html:not(.dark) aside.app-sidebar .sidebar-link-inactive:hover span,
+html.dark aside.app-sidebar .sidebar-link-inactive:hover span {
+  color: #E6EDF7 !important;
+}
+
+aside.app-sidebar .sidebar-footer,
+html:not(.dark) aside.app-sidebar .sidebar-footer,
+html.dark aside.app-sidebar .sidebar-footer {
+  background-color: #0D1F36 !important;
+  border-color: #1E3A5F !important;
+  color: #94A3B8 !important;
+}
+
+aside.app-sidebar .sidebar-footer-title,
+html:not(.dark) aside.app-sidebar .sidebar-footer-title,
+html.dark aside.app-sidebar .sidebar-footer-title {
+  color: #E6EDF7 !important;
+}
+
+/* ============================================================
+   LIGHT MODE DESIGN SYSTEM FOR CONTENT, CARDS, & TABLES
+   ============================================================ */
+html:not(.dark) {
+  /* Modal Overlay */
+  .fixed.inset-0.bg-black\/75 {
+    background-color: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Card and Modal Container Backgrounds (excluding sidebar) */
+  :not(aside).bg-\[\#0D1F36\],
+  main .bg-\[\#0D1F36\] {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  }
+  :not(aside).bg-\[\#071426\],
+  main .bg-\[\#071426\] {
+    background-color: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+  }
+  :not(aside).bg-\[\#0A182B\],
+  main .bg-\[\#0A182B\] {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+  }
+  :not(aside).bg-\[\#0A182B\]\/95,
+  main .bg-\[\#0A182B\]\/95 {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  }
+  :not(aside).bg-\[\#09172A\],
+  main .bg-\[\#09172A\] {
+    background-color: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+  }
+  :not(aside).bg-\[\#0E2038\],
+  main .bg-\[\#0E2038\] {
+    background-color: #F1F5F9 !important;
+  }
+
+  /* Thin Horizontal Lines and Dividers (excluding sidebar) */
+  :not(aside).bg-\[\#1A3358\],
+  main .bg-\[\#1A3358\] {
+    background-color: #E2E8F0 !important;
+  }
+  :not(aside).border-\[\#1E3A5F\],
+  :not(aside).border-\[\#1A2E4C\],
+  :not(aside).border-\[\#162F52\],
+  :not(aside).border-\[\#18355C\],
+  :not(aside).border-\[\#1A3358\],
+  :not(aside).border-\[\#164375\],
+  :not(aside).border-\[\#174F88\],
+  :not(aside).border-\[\#1A4378\],
+  :not(aside).border-\[\#1E4378\],
+  :not(aside).border-\[\#15604B\],
+  :not(aside).border-\[\#4C2880\],
+  :not(aside).border-\[\#0A545E\],
+  :not(aside).border-\[\#5E4413\],
+  :not(aside).border-\[\#5C1D25\],
+  main [class*="border-[#"] {
+    border-color: #E2E8F0 !important;
+  }
+
+  main .divide-\[\#132845\] > :not([hidden]) ~ :not([hidden]) {
+    border-color: #F1F5F9 !important;
+  }
+
+  /* Texts in Main and Modals (excluding sidebar) */
+  :not(aside).text-\[\#F8FAFC\],
+  :not(aside).text-\[\#E6EDF7\],
+  main .text-\[\#F8FAFC\],
+  main .text-\[\#E6EDF7\] {
+    color: #0F172A !important;
+  }
+  :not(aside).text-\[\#CBD5E1\],
+  main .text-\[\#CBD5E1\] {
+    color: #334155 !important;
+  }
+  :not(aside).text-\[\#94A3B8\],
+  main .text-\[\#94A3B8\] {
+    color: #64748B !important;
+  }
+  :not(aside).text-\[\#64748B\],
+  main .text-\[\#64748B\] {
+    color: #94A3B8 !important;
+  }
+  :not(aside).text-\[\#1E3A5F\],
+  main .text-\[\#1E3A5F\] {
+    color: #CBD5E1 !important;
+  }
+
+  /* Headings & Texts inside dark-turned-light containers */
+  main h3.text-white,
+  main h2.text-white,
+  main span.text-white:not(button span):not(button.text-white):not(.sidebar-link-active *),
+  main td.text-white,
+  main div.text-white,
+  main table .text-white:not(button span):not(button.text-white),
+  main tr:hover .text-white:not(button span):not(button.text-white) {
+    color: #0F172A !important;
+  }
+
+  /* Titles & Accents */
+  .text-\[\#38BDF8\] {
+    color: #0284C7 !important;
+  }
+  th.text-\[\#38BDF8\] {
+    color: #0369A1 !important;
+  }
+  .text-\[\#34D399\] {
+    color: #059669 !important;
+  }
+  .text-\[\#C084FC\] {
+    color: #7E22CE !important;
+  }
+  .text-\[\#6EE7B7\] {
+    color: #047857 !important;
+  }
+  .text-\[\#D8B4FE\] {
+    color: #6B21A8 !important;
+  }
+
+  /* Table Rows & Interactive Elements Hover */
+  .hover\:bg-\[\#102444\]\/60:hover,
+  .hover\:bg-\[\#102444\]\/40:hover {
+    background-color: #F8FAFC !important;
+  }
+  .hover\:bg-\[\#122846\]:hover {
+    background-color: #F1F5F9 !important;
+    color: #1677FF !important;
+  }
+  .hover\:bg-\[\#1A2E4C\]:hover {
+    background-color: #F1F5F9 !important;
+    color: #0F172A !important;
+  }
+  button.hover\:text-white:hover {
+    color: #0F172A !important;
+  }
+
+  /* Form Inputs, Selects, and Textareas */
+  input.bg-\[\#071426\],
+  select.bg-\[\#071426\],
+  select.bg-\[\#0A182B\],
+  textarea.bg-\[\#071426\] {
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+    color: #0F172A !important;
+  }
+  input.bg-\[\#071426\]::placeholder,
+  textarea.bg-\[\#071426\]::placeholder {
+    color: #94A3B8 !important;
+  }
+  input.bg-\[\#071426\]:focus,
+  select.bg-\[\#071426\]:focus,
+  select.bg-\[\#0A182B\]:focus,
+  textarea.bg-\[\#071426\]:focus {
+    border-color: #1677FF !important;
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.15) !important;
+  }
+  select.bg-\[\#071426\] option,
+  select.bg-\[\#0A182B\] option {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+  input[type="date"] {
+    color-scheme: light !important;
+  }
+
+  /* Action Buttons in Table */
+  /* Detail: Cyan */
+  .bg-\[\#07383E\] {
+    background-color: #ECFEFF !important;
+    border-color: #BAE6FD !important;
+    color: #0284C7 !important;
+  }
+  .bg-\[\#07383E\]:hover {
+    background-color: #E0F2FE !important;
+    border-color: #7DD3FC !important;
+    color: #0369A1 !important;
+  }
+
+  /* Edit: Amber */
+  .bg-\[\#3D2C0D\] {
+    background-color: #FFFBEB !important;
+    border-color: #FDE68A !important;
+    color: #D97706 !important;
+  }
+  .bg-\[\#3D2C0D\]:hover {
+    background-color: #FEF3C7 !important;
+    border-color: #FCD34D !important;
+    color: #B45309 !important;
+  }
+
+  /* Delete: Rose */
+  .bg-\[\#3C1318\] {
+    background-color: #FFF1F2 !important;
+    border-color: #FECDD3 !important;
+    color: #E11D48 !important;
+  }
+  .bg-\[\#3C1318\]:hover {
+    background-color: #FFE4E6 !important;
+    border-color: #FDA4AF !important;
+    color: #BE123C !important;
+  }
+
+  /* Badges */
+  .bg-\[\#0C2548\],
+  .bg-\[\#0D2F54\],
+  .bg-\[\#0D264A\],
+  .bg-\[\#0F294D\] {
+    background-color: #EFF6FF !important;
+    border-color: #BFDBFE !important;
+    color: #1D4ED8 !important;
+  }
+  .bg-\[\#0A2E24\] {
+    background-color: #ECFDF5 !important;
+    border-color: #A7F3D0 !important;
+    color: #047857 !important;
+  }
+  .bg-\[\#24133F\] {
+    background-color: #FAF5FF !important;
+    border-color: #E9D5FF !important;
+    color: #7E22CE !important;
+  }
+
+  /* 3D Illustration Containers */
+  .bg-\[\#071527\] {
+    background-color: #F0F9FF !important;
+    border-color: #BAE6FD !important;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.12) !important;
+  }
+  .bg-\[\#061814\] {
+    background-color: #F0FDF4 !important;
+    border-color: #BBF7D0 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12) !important;
+  }
+  .bg-\[\#0F0B1E\] {
+    background-color: #FAF5FF !important;
+    border-color: #E9D5FF !important;
+    box-shadow: 0 4px 12px rgba(192, 132, 252, 0.12) !important;
+  }
+
+  /* Alert / Error / Warning boxes */
+  .bg-rose-500\/10 {
+    background-color: #FFF1F2 !important;
+    border-color: #FECDD3 !important;
+    color: #BE123C !important;
+  }
+  .text-rose-300 {
+    color: #BE123C !important;
+  }
+  .text-rose-400 {
+    color: #E11D48 !important;
+  }
+  .text-emerald-400 {
+    color: #059669 !important;
+  }
+  .bg-emerald-500\/15 {
+    background-color: #ECFDF5 !important;
+    color: #047857 !important;
+    border-color: #A7F3D0 !important;
+  }
+  .bg-amber-500\/15 {
+    background-color: #FFFBEB !important;
+    color: #B45309 !important;
+    border-color: #FDE68A !important;
+  }
+  .bg-rose-500\/15 {
+    background-color: #FFF1F2 !important;
+    color: #BE123C !important;
+    border-color: #FECDD3 !important;
+  }
+
+  /* Indicator Dots */
+  .bg-\[\#00E5FF\] {
+    background-color: #0284C7 !important;
+    box-shadow: 0 0 6px rgba(2, 132, 199, 0.35) !important;
+  }
+  .bg-\[\#10B981\] {
+    background-color: #059669 !important;
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.35) !important;
+  }
+  .bg-\[\#C084FC\] {
+    background-color: #7E22CE !important;
+    box-shadow: 0 0 6px rgba(126, 34, 206, 0.35) !important;
+  }
+}
+
+/* ============================================================
+   EXPORT PAGE: SINGLE THEMED CALENDAR ICON ON THE LEFT
+   ============================================================ */
+.export-date-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.export-date-input::-webkit-inner-spin-button,
+.export-date-input::-webkit-clear-button {
+  display: none;
+}
+
+
 

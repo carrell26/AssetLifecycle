@@ -31,7 +31,7 @@ export default function HeroBanner({ userName, userRole }) {
       {/* Ambient Glow */}
       <div
         className={`absolute -top-12 -right-12 w-64 h-64 rounded-full blur-3xl pointer-events-none ${
-          isDark ? "bg-[#1677FF]/20" : "bg-[#EE2E24]/15"
+          isDark ? "bg-[#1677FF]/20" : "bg-[#1677FF]/15"
         }`}
       ></div>
 

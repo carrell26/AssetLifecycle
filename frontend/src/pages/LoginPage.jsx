@@ -241,7 +241,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div style={styles.footer}>
             <p style={styles.footerText}>
-              Butuh bantuan?{" "}
+              Butuh bantuan atau pembuatan akun?{" "}
               <button
                 type="button"
                 onClick={() => setContactModalOpen(true)}
@@ -249,12 +249,6 @@ export default function LoginPage() {
               >
                 Hubungi admin sistem
               </button>
-            </p>
-            <p style={styles.footerText}>
-              Belum punya akun?{" "}
-              <a href="/auth/register" style={styles.footerLink}>
-                Daftar
-              </a>
             </p>
           </div>
         </div>

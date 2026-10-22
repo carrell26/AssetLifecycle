@@ -16,7 +16,9 @@ class Module(db.Model):
     unit_part_number = db.Column(db.String(100))
     original_date = db.Column(db.String(50))
     kondisi = db.Column(db.String(20), default="AKTIF")  # RUSAK / IDLE / AKTIF
+    import_id = db.Column(db.Integer, db.ForeignKey("data_imports.import_id", ondelete="CASCADE"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     positions = db.relationship("ModulePosition", back_populates="module", cascade="all, delete-orphan")
+    data_import = db.relationship("DataImport", back_populates="modules")

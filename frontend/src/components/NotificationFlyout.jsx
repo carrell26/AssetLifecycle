@@ -7,8 +7,8 @@ const INITIAL_NOTIFICATIONS = [
     category: "approval",
     icon: "assignment",
     iconColor: "text-amber-400 bg-amber-500/15 border-amber-500/30",
-    title: "Pengajuan Modul Baru (PSS24-003)",
-    desc: "Teknisi mengajukan mutasi modul di STO Palu 1. Menunggu approval PJ.",
+    title: "Mutasi Modul Baru (PSS24-003)",
+    desc: "Karyawan TIF mencatat mutasi modul di STO Palu 1.",
     time: "10 menit yang lalu",
     actions: [
       { label: "Review", href: "/modules/requests", primary: true },

@@ -114,7 +114,7 @@ export default function RecentActivities({ activities }) {
             className={`text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors ${
               isDark
                 ? "text-[#1677FF] hover:text-[#38BDF8]"
-                : "text-[#EE2E24] hover:text-red-700"
+                : "text-blue-600 hover:text-blue-700"
             }`}
           >
             <span>{expanded ? "Tampilkan Lebih Sedikit" : "Lihat Semua"}</span>

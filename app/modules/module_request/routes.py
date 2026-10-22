@@ -5,10 +5,10 @@ dan FR-6 (Hash Chain via audit_logs, terhubung otomatis saat request disetujui).
 Rute yang tersedia:
   GET/POST /modules/new           -> ajukan pemasangan/perpindahan/pelepasan modul
   GET      /modules/requests      -> daftar pengajuan (difilter sesuai role)
-  POST     /modules/requests/<id>/approve  -> PJ/Admin menyetujui
-  POST     /modules/requests/<id>/reject   -> PJ/Admin menolak
+  POST     /modules/requests/<id>/approve  -> Karyawan TIF/Admin menyetujui
+  POST     /modules/requests/<id>/reject   -> Karyawan TIF/Admin menolak
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 
 from ...extensions import db
@@ -77,7 +77,7 @@ def _apply_approved_request(module_request, actor_user):
 
     movement = ModuleMovement(
         module_id=module_request.module_id,
-        user_id=module_request.requested_by,
+        user_id=actor_user.user_id,
         from_device_id=module_request.from_device_id,
         from_slot_definition_id=module_request.from_slot_definition_id,
         to_device_id=module_request.to_device_id,
@@ -111,9 +111,11 @@ def _apply_approved_request(module_request, actor_user):
 
 @module_request_bp.route("/new", methods=["GET", "POST"])
 @login_required
-@role_required("admin", "karyawan_tif", "teknisi")
+@role_required("admin", "karyawan_tif")
 def new_request():
     if request.method == "POST":
+        if current_user.role not in ["admin", "karyawan_tif"]:
+            abort(403)
         jenis = request.form.get("jenis_perubahan")
         alasan = request.form.get("alasan", "").strip()
 
@@ -193,7 +195,7 @@ def new_request():
             flash("Pengajuan otomatis disetujui dan langsung tercatat.", "success")
         else:
             db.session.commit()
-            flash("Pengajuan berhasil dikirim, menunggu persetujuan PJ district kamu.", "success")
+            flash("Pengajuan berhasil dikirim.", "success")
 
         return redirect(url_for("module_request.list_requests"))
 
@@ -208,7 +210,7 @@ def new_request():
 
 @module_request_bp.route("/requests")
 @login_required
-@role_required("admin", "karyawan_tif", "teknisi")
+@role_required("admin", "karyawan_tif")
 def list_requests():
     if current_user.role == "teknisi":
         requests_list = (
@@ -231,7 +233,7 @@ def list_requests():
     else:
         requests_list = ModuleRequest.query.order_by(ModuleRequest.created_at.desc()).all()
 
-    can_approve = current_user.role == "admin" or (current_user.role == "karyawan_tif" and current_user.is_pj)
+    can_approve = current_user.role in ("admin", "karyawan_tif")
     return render_template("module_request/list_requests.html", requests=requests_list, can_approve=can_approve)
 
 
@@ -239,10 +241,6 @@ def list_requests():
 @login_required
 @role_required("admin", "karyawan_tif")
 def approve_request(request_id):
-    if current_user.role == "karyawan_tif" and not current_user.is_pj:
-        flash("Kamu bukan PJ, tidak bisa menyetujui pengajuan.", "error")
-        return redirect(url_for("module_request.list_requests"))
-
     module_request = ModuleRequest.query.get_or_404(request_id)
     if module_request.status != "PENDING":
         flash("Pengajuan ini sudah diproses sebelumnya.", "error")
@@ -284,10 +282,6 @@ def approve_request(request_id):
 @login_required
 @role_required("admin", "karyawan_tif")
 def reject_request(request_id):
-    if current_user.role == "karyawan_tif" and not current_user.is_pj:
-        flash("Kamu bukan PJ, tidak bisa menolak pengajuan.", "error")
-        return redirect(url_for("module_request.list_requests"))
-
     module_request = ModuleRequest.query.get_or_404(request_id)
     if module_request.status != "PENDING":
         flash("Pengajuan ini sudah diproses sebelumnya.", "error")
@@ -318,6 +312,12 @@ def inventory():
     Kolom: Nama Perangkat (NE), Unit Type, Location, Port, Shelf, Slot,
            Unit Part Number, Serial Number, Date (DD/MM/YYYY).
     """
+    import os
+    from flask import current_app
+    react_template_path = os.path.join(current_app.root_path, "templates", "react_index.html")
+    if os.path.exists(react_template_path) and not request.args.get("legacy"):
+        return render_template("react_index.html", current_user=current_user)
+
     ne_filter = request.args.get("ne", "").strip()
     search_query = request.args.get("q", "").strip()
     show_all = request.args.get("all", "0") == "1"

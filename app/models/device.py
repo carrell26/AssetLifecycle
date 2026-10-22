@@ -13,5 +13,8 @@ class Device(db.Model):
     hostname = db.Column(db.String(150))
     status = db.Column(db.String(50))
     keterangan = db.Column(db.Text)
+    import_id = db.Column(db.Integer, db.ForeignKey("data_imports.import_id", ondelete="SET NULL"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    data_import = db.relationship("DataImport", back_populates="devices")

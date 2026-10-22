@@ -7,8 +7,8 @@ Rute yang tersedia:
   GET/POST /device/locations                       -> Admin/Karyawan TIF kelola Location
   GET/POST /device/devices                         -> Admin/Karyawan TIF kelola Devices, dengan filter (FR-3.2)
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask_login import login_required, current_user
 
 from ...extensions import db
 from ...models import DeviceType, SlotDefinition, Location, Device
@@ -82,9 +82,11 @@ def slot_definitions(device_type_id):
 
 @device_bp.route("/locations", methods=["GET", "POST"])
 @login_required
-@role_required("admin", "karyawan_tif")
+@role_required("admin", "karyawan_tif", "teknisi")
 def locations():
     if request.method == "POST":
+        if current_user.role not in ["admin", "karyawan_tif"]:
+            abort(403)
         nama_lokasi = request.form.get("nama_lokasi", "").strip()
         alamat = request.form.get("alamat", "").strip()
         district = request.form.get("district", "").strip()
@@ -116,6 +118,13 @@ def locations():
         flash(f"Lokasi '{nama_lokasi}' berhasil ditambahkan.", "success")
         return redirect(url_for("device.locations"))
 
+    if request.method == "GET":
+        import os
+        from flask import current_app
+        react_template_path = os.path.join(current_app.root_path, "templates", "react_index.html")
+        if os.path.exists(react_template_path) and not request.args.get("legacy"):
+            return render_template("react_index.html", current_user=current_user)
+
     show_all = request.args.get("all", "0") == "1"
     if show_all:
         locs = Location.query.order_by(Location.nama_lokasi).all()
@@ -136,9 +145,18 @@ def locations():
 
 @device_bp.route("/devices", methods=["GET", "POST"])
 @login_required
-@role_required("admin", "karyawan_tif")
+@role_required("admin", "karyawan_tif", "teknisi")
 def devices():
+    if request.method == "GET":
+        import os
+        from flask import current_app
+        react_template_path = os.path.join(current_app.root_path, "templates", "react_index.html")
+        if os.path.exists(react_template_path) and not request.args.get("legacy"):
+            return render_template("react_index.html", current_user=current_user)
+
     if request.method == "POST":
+        if current_user.role not in ["admin", "karyawan_tif"]:
+            abort(403)
         device_type_id = request.form.get("device_type_id")
         location_id = request.form.get("location_id")
         nama_perangkat = request.form.get("nama_perangkat", "").strip()
