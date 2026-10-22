@@ -282,17 +282,29 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
           <span>Dashboard</span>
         </a>
+        <a href="{{ url_for('device.devices') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
+          <span>Perangkat</span>
+        </a>
+        <a href="{{ url_for('module_request.inventory') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span>Modul</span>
+        </a>
+        <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
+          <span>Lokasi</span>
+        </a>
         <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span>Pengajuan Perpindahan</span>
+          <span>Mutasi Modul</span>
         </a>
-        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+        <a href="{{ url_for('ar.scan') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span>AR/VR</span>
+          <span>Scan</span>
         </a>
 
-      {% elif current_user.role == 'karyawan_tif' and current_user.is_pj %}
-        <!-- KARYAWAN TIF (PJ) -->
+      {% elif current_user.role == 'karyawan_tif' %}
+        <!-- KARYAWAN TIF -->
         <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
           <span>Dashboard</span>
@@ -301,17 +313,17 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
           <span>Perangkat</span>
         </a>
+        <a href="{{ url_for('module_request.inventory') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+          <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
+          <span>Modul</span>
+        </a>
         <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
           <span>Lokasi</span>
         </a>
         <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span>Pengajuan Modul</span>
-        </a>
-        <a href="{{ url_for('auth.register_teknisi') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">person_add</span>
-          <span>Daftarkan Teknisi</span>
+          <span>Mutasi Modul</span>
         </a>
         <a href="{{ url_for('data_import.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
@@ -325,44 +337,9 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
           <span>Audit Log</span>
         </a>
-        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+        <a href="{{ url_for('ar.scan') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span>AR/VR</span>
-        </a>
-
-      {% elif current_user.role == 'karyawan_tif' and not current_user.is_pj %}
-        <!-- KARYAWAN TIF BIASA -->
-        <a href="{{ url_for('index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">dashboard</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="{{ url_for('device.devices') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
-          <span>Perangkat</span>
-        </a>
-        <a href="{{ url_for('device.locations') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">location_on</span>
-          <span>Lokasi</span>
-        </a>
-        <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span>Pengajuan Modul</span>
-        </a>
-        <a href="{{ url_for('data_import.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">upload_file</span>
-          <span>Import Data</span>
-        </a>
-        <a href="{{ url_for('export.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">download</span>
-          <span>Export Data</span>
-        </a>
-        <a href="{{ url_for('audit.logs') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
-          <span>Audit Log</span>
-        </a>
-        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
-          <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span>AR/VR</span>
+          <span>Scan</span>
         </a>
 
       {% else %}
@@ -375,7 +352,7 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">router</span>
           <span>Perangkat</span>
         </a>
-        <a href="{{ url_for('device.device_types') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+        <a href="{{ url_for('module_request.inventory') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">memory</span>
           <span>Modul</span>
         </a>
@@ -385,7 +362,7 @@
         </a>
         <a href="{{ url_for('module_request.list_requests') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">assignment</span>
-          <span>Pengajuan Modul</span>
+          <span>Mutasi Modul</span>
         </a>
         <a href="{{ url_for('auth.manage_users') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">manage_accounts</span>
@@ -411,9 +388,9 @@
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">history</span>
           <span>Audit Log</span>
         </a>
-        <a href="{{ url_for('ar.index') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
+        <a href="{{ url_for('ar.scan') }}" class="nav-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] transition-all duration-200">
           <span class="material-symbols-outlined text-[19px] text-[#64748B]">view_in_ar</span>
-          <span>AR/VR</span>
+          <span>Scan</span>
         </a>
       {% endif %}
     </nav>
@@ -463,51 +440,76 @@
 
     <!-- GAMBAR 1 FIX: Real User Profile Photo & Menu matching Dashboard Header -->
     <div class="relative" id="profile-container">
-      <button type="button" id="profile-btn" onclick="toggleProfileDropdown(event)"
-        class="flex items-center gap-2.5 p-1 rounded-full transition-colors cursor-pointer hover:bg-[#0D1F36]">
+      <button type="button" id="profileTriggerBtn" onclick="toggleProfileDropdown(event)"
+        class="flex items-center gap-2.5 p-1 rounded-full transition-colors cursor-pointer hover:bg-slate-100 dark:hover:bg-[#0D1F36]">
         <div class="relative shrink-0">
           <img
             id="header-user-avatar"
-            src="{{ current_user.get_avatar_url() or 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK' }}"
+            src="{{ current_user.get_avatar_url() or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}"
             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256'"
             alt="{{ current_user.name or 'Admin Asset' }}"
             class="w-9 h-9 rounded-full object-cover ring-2 ring-[#1677FF] shadow-sm transition-all duration-300">
-          <span id="header-avatar-status" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#10B981] ring-2 ring-[#071426]" title="Status Online"></span>
+          <span id="header-avatar-status" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#071426]" title="Status Online"></span>
         </div>
         <div class="flex flex-col text-left justify-center min-w-0 pr-1">
           <div class="flex items-center gap-1 leading-tight">
-            <span id="profile-user-name" class="text-xs font-semibold text-[#E6EDF7] truncate max-w-[130px]">{{ current_user.name or 'Admin Asset' }}</span>
-            <span class="material-symbols-outlined text-[17px] text-[#94A3B8] transition-transform duration-200" id="profile-chevron">expand_more</span>
+            <span id="profile-user-name" class="text-xs font-semibold max-w-[130px] truncate text-slate-800 dark:text-[#E6EDF7]">{{ current_user.name or 'Admin Asset' }}</span>
+            <span class="material-symbols-outlined text-[17px] text-slate-500 dark:text-[#94A3B8] transition-transform duration-200" id="profile-chevron">expand_more</span>
           </div>
-          <span id="profile-user-role" class="text-[11px] text-[#38BDF8] leading-none mt-0.5">{{ current_user.role|capitalize if current_user.role else 'Admin' }}</span>
+          <span id="profile-user-role" class="text-[11px] leading-none mt-0.5 capitalize text-blue-600 dark:text-[#38BDF8]">{{ current_user.role|replace('_', ' ') if current_user.role else 'Admin' }}</span>
         </div>
       </button>
 
-      <!-- Dropdown Popover matching Header.jsx profile card -->
-      <div id="profile-dropdown" class="absolute right-0 top-12 mt-2 w-72 rounded-2xl bg-[#0D1F36] border border-[#1E3653] shadow-2xl p-4 z-50 transition-all duration-200 transform origin-top-right hidden opacity-0 scale-95">
-        <div class="flex items-center gap-3 pb-3 border-b border-[#1A2E4C]" id="profile-dropdown-divider">
-          <img
-            id="dropdown-user-avatar"
-            src="{{ current_user.get_avatar_url() or 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMhMNjB5yOsp1XWjzJQQRBxs_SIyVjEvOSMCfz-STmgneAk6eKfCywAPg0zx3X1zg5O8TZ8iXvpBCKHwTHiXLF62l5n80wUuOCXfmRMwFoJZH14Skts_O2h5czLDCwstMDcH77g2yTeq4ufiPsgB76YJdw8pdWoWlWldcsqsuVuQpEB4tNp3wk0XRlRJijUXsntwGGZDIua5uvYM4VgeCR_gwipzDEoLyTY9VQuJc4S1cb9PxJUCK' }}"
-            onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256'"
-            alt="{{ current_user.name or 'Admin' }}"
-            class="w-11 h-11 rounded-full object-cover ring-2 ring-[#1677FF]/40 shadow-sm shrink-0">
+      <!-- Standardized Profile Popover matching Dashboard reference -->
+      <div id="userProfileDropdown" class="hidden absolute right-0 top-12 mt-2 w-[340px] rounded-2xl shadow-2xl p-5 z-50 border backdrop-blur-md transition-all duration-200 bg-white/95 dark:bg-[#0D1F36]/95 border-slate-200 dark:border-[#1E3653] text-slate-800 dark:text-[#E6EDF7]">
+        <!-- Header inside dropdown with Avatar -->
+        <div class="flex items-center gap-3.5 pb-4 border-b border-slate-100 dark:border-[#1A2E4C] relative">
+          <div class="relative group">
+            <img
+              id="dropdown-user-avatar"
+              src="{{ current_user.get_avatar_url() or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}"
+              onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256'"
+              alt="{{ current_user.name or 'Admin' }}"
+              class="w-12 h-12 rounded-full object-cover ring-2 shadow-md ring-[#1677FF]/40 shrink-0">
+            <button type="button" onclick="document.getElementById('registerAvatarInput').click()" title="Ubah Foto Profil (Kamera / Galeri)" class="avatar-camera-btn absolute -bottom-1 -right-1 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-md border transition-transform hover:scale-110 cursor-pointer bg-[#1677FF] hover:bg-[#38BDF8] border-white dark:border-[#071426]">
+              <span class="material-symbols-outlined text-[13px]">photo_camera</span>
+            </button>
+          </div>
           <div class="flex flex-col min-w-0 flex-1">
-            <p class="text-xs font-semibold text-[#E6EDF7] truncate" id="profile-dropdown-user-name">{{ current_user.name or 'Admin Asset' }}</p>
-            <p class="text-[11px] text-[#94A3B8] truncate" id="profile-dropdown-user-email">{{ current_user.email or 'admin@telkom.co.id' }}</p>
-            <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-[#1677FF]/20 text-[#38BDF8] border border-[#1677FF]/30 rounded-full w-fit">
-              {{ current_user.role|capitalize if current_user.role else 'Admin' }}
-            </span>
+            <h4 class="text-sm font-semibold truncate text-slate-900 dark:text-[#E6EDF7]">{{ current_user.name or 'Admin Asset' }}</h4>
+            <p class="text-[11px] font-medium leading-tight mt-0.5 capitalize text-blue-600 dark:text-[#38BDF8]">{{ current_user.role|replace('_', ' ') if current_user.role else 'Admin' }}</p>
           </div>
         </div>
-        <div class="pt-2">
-          <a href="{{ url_for('auth.logout') }}"
-             class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors">
-            <span class="material-symbols-outlined text-[17px]">logout</span>
-            <span>Keluar dari Akun</span>
+
+        <!-- Account Information Details -->
+        <div class="py-3.5 space-y-2.5">
+          <span class="text-[10px] font-semibold tracking-wide uppercase font-mono text-slate-500 dark:text-[#94A3B8]">Informasi Akun</span>
+          <div class="rounded-xl p-3 border space-y-2 text-xs bg-slate-50 dark:bg-[#071426] border-slate-200 dark:border-[#1A2E4C]">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-[11px] shrink-0 text-slate-500 dark:text-[#94A3B8]">District</span>
+              <span class="font-medium text-right truncate text-[11px] text-slate-800 dark:text-[#E6EDF7]">{{ current_user.district or "—" }}</span>
+            </div>
+            <div class="flex items-start justify-between gap-2 pt-1 border-t border-slate-200 dark:border-[#1A2E4C]/60">
+              <span class="text-[11px] shrink-0 text-slate-500 dark:text-[#94A3B8]">Email</span>
+              <span class="font-mono text-right truncate text-[11px] text-blue-600 dark:text-[#38BDF8]">{{ current_user.email or 'admin@telkom.co.id' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-3 border-t border-slate-100 dark:border-[#1A2E4C] flex flex-col gap-2">
+          <button type="button" onclick="document.getElementById('registerAvatarInput').click()" class="btn-change-avatar rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition-colors cursor-pointer border bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 dark:bg-[#1677FF]/15 dark:text-[#38BDF8] dark:border-[#1677FF]/30 dark:hover:bg-[#1677FF]/25">
+            <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+            Ganti Foto Profil
+          </button>
+          <input type="file" id="registerAvatarInput" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="uploadRegisterAvatar(this)">
+          <a href="{{ url_for('auth.logout') }}" class="btn-logout text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/25 rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition duration-200 cursor-pointer shadow-sm active:scale-[0.98]">
+            <span class="material-symbols-outlined text-[16px]">logout</span>
+            Keluar dari akun
           </a>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </header>
@@ -906,7 +908,7 @@
   // ── PROFILE DROPDOWN ───────────────────────────────────────
   function toggleProfileDropdown(event) {
     if (event) event.stopPropagation();
-    const dropdown = document.getElementById('profile-dropdown');
+    const dropdown = document.getElementById('userProfileDropdown') || document.getElementById('profile-dropdown');
     const chevron = document.getElementById('profile-chevron');
     if (!dropdown) return;
 
@@ -916,24 +918,46 @@
       requestAnimationFrame(() => {
         dropdown.classList.remove('opacity-0', 'scale-95');
       });
-      if (chevron) chevron.style.transform = 'rotate(180deg)';
+      if (chevron) chevron.classList.add('rotate-180');
     } else {
       dropdown.classList.add('opacity-0', 'scale-95');
       setTimeout(() => dropdown.classList.add('hidden'), 150);
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
+      if (chevron) chevron.classList.remove('rotate-180');
     }
   }
 
   document.addEventListener('click', function(e) {
     const container = document.getElementById('profile-container');
-    const dropdown = document.getElementById('profile-dropdown');
+    const dropdown = document.getElementById('userProfileDropdown') || document.getElementById('profile-dropdown');
     const chevron = document.getElementById('profile-chevron');
     if (container && !container.contains(e.target) && dropdown && !dropdown.classList.contains('hidden')) {
       dropdown.classList.add('opacity-0', 'scale-95');
       setTimeout(() => dropdown.classList.add('hidden'), 150);
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
+      if (chevron) chevron.classList.remove('rotate-180');
     }
   });
+
+  function uploadRegisterAvatar(input) {
+    if (!input.files || !input.files[0]) return;
+    const formData = new FormData();
+    formData.append('avatar', input.files[0]);
+    fetch('/api/me/avatar', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.avatar_url) {
+        window.location.reload();
+      } else {
+        alert(data.error || 'Gagal mengunggah foto profil');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Terjadi kesalahan saat mengunggah foto profil');
+    });
+  }
 
   // ── PASSWORD VISIBILITY TOGGLE ─────────────────────────────
   function togglePassword() {

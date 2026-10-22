@@ -143,6 +143,93 @@ button:hover, .btn:hover {
     box-shadow: 0 6px 14px rgba(22, 119, 255, 0.35);
 }
 
+/* Reset for Topbar Profile Button to match Dashboard */
+#profileTriggerBtn {
+    margin: 0 !important;
+    padding: 4px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+#profileTriggerBtn:hover {
+    box-shadow: none !important;
+}
+
+html.dark #profileTriggerBtn:hover {
+    background: #0D1F36 !important;
+    box-shadow: none !important;
+}
+
+html:not(.dark) #profileTriggerBtn:hover,
+html.light #profileTriggerBtn:hover {
+    background: #f1f5f9 !important;
+    box-shadow: none !important;
+}
+
+#profileTriggerBtn:focus,
+#profileTriggerBtn:active {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* ============================================================
+   GLOBAL PROFILE POPOVER STANDARDIZATION — DASHBOARD REFERENCE
+   ============================================================ */
+#userProfileDropdown button,
+#userProfileDropdown a {
+    box-shadow: none !important;
+}
+
+#userProfileDropdown button:hover,
+#userProfileDropdown a:hover {
+    box-shadow: none !important;
+}
+
+/* Ganti Foto Profil button: matching Dashboard (no excessive blue glow shadow) */
+#userProfileDropdown .btn-change-avatar,
+#userProfileDropdown button.btn-change-avatar {
+    box-shadow: none !important;
+}
+
+html.dark #userProfileDropdown .btn-change-avatar:hover,
+html.dark #userProfileDropdown button.btn-change-avatar:hover {
+    background-color: rgba(22, 119, 255, 0.25) !important;
+    color: #38BDF8 !important;
+    box-shadow: none !important;
+}
+
+html:not(.dark) #userProfileDropdown .btn-change-avatar:hover,
+html.light #userProfileDropdown .btn-change-avatar:hover,
+html:not(.dark) #userProfileDropdown button.btn-change-avatar:hover,
+html.light #userProfileDropdown button.btn-change-avatar:hover {
+    background-color: #dbeafe !important;
+    color: #2563eb !important;
+    box-shadow: none !important;
+}
+
+/* Small camera icon button on top of avatar in popover */
+#userProfileDropdown .avatar-camera-btn,
+#userProfileDropdown button.avatar-camera-btn {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+#userProfileDropdown .avatar-camera-btn:hover,
+#userProfileDropdown button.avatar-camera-btn:hover {
+    background-color: #38BDF8 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Keluar dari akun button */
+#userProfileDropdown .btn-logout:hover,
+#userProfileDropdown a.btn-logout:hover,
+#userProfileDropdown button.btn-logout:hover {
+    background-color: #f43f5e !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
 .btn--secondary {
     background: transparent;
     color: var(--ink);

@@ -5,67 +5,56 @@ export default function Sidebar({ user }) {
   const { isDark } = useTheme();
 
   const role = user?.role;
-  const isPj = Boolean(user?.is_pj);
 
   const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
-  const isModulActive = currentPath.startsWith("/modules");
+  const isMutasiActive = currentPath.startsWith("/modules/requests") || currentPath.startsWith("/modules/new");
+  const isModulActive = currentPath.startsWith("/modules") && !isMutasiActive;
   const isLokasiActive = currentPath.startsWith("/device/locations");
   const isPerangkatActive = currentPath.startsWith("/device/devices") || currentPath.startsWith("/devices");
   const isImportActive = currentPath.startsWith("/import");
   const isExportActive = currentPath.startsWith("/export");
-  const isDashboardActive = (currentPath === "/" || currentPath === "") && !isModulActive && !isLokasiActive && !isPerangkatActive && !isImportActive && !isExportActive;
+  const isAuditActive = currentPath.startsWith("/audit");
+  const isScanActive = currentPath.startsWith("/ar");
+  const isKelolaUserActive = currentPath.startsWith("/auth/admin/users") || currentPath.startsWith("/auth/admin/register-karyawan");
+  const isDashboardActive = (currentPath === "/" || currentPath === "") && !isModulActive && !isLokasiActive && !isPerangkatActive && !isImportActive && !isExportActive && !isMutasiActive && !isAuditActive && !isScanActive && !isKelolaUserActive;
 
   let navItems = [];
 
   if (role === "teknisi") {
-    // 4. TEKNISI: Dashboard, Modul (view-only), Pengajuan, dan AR/VR
-    navItems = [
-      { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: isDashboardActive },
-      { id: "modul", label: "Modul", icon: "memory", href: "/modules/", active: isModulActive },
-      { id: "pengajuan", label: "Pengajuan Perpindahan", icon: "assignment", href: "/modules/requests" },
-      { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
-    ];
-  } else if (role === "karyawan_tif" && isPj) {
-    // 2. KARYAWAN TIF (PJ): Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Daftarkan Teknisi, Import, Export, Audit, AR
+    // TEKNISI (View-only): Dashboard, Perangkat, Modul, Lokasi, Scan
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: isDashboardActive },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices", active: isPerangkatActive },
       { id: "modul", label: "Modul", icon: "memory", href: "/modules/", active: isModulActive },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations", active: isLokasiActive },
-      { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
-      { id: "daftarkan-teknisi", label: "Daftarkan Teknisi", icon: "person_add", href: "/auth/register-teknisi" },
-      { id: "import", label: "Import Data", icon: "upload_file", href: "/import/", active: isImportActive },
-      { id: "export", label: "Export Data", icon: "download", href: "/export/", active: isExportActive },
-      { id: "audit", label: "Audit Log", icon: "history", href: "/audit/" },
-      { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
+      { id: "scan", label: "Scan", icon: "view_in_ar", href: "/ar/", active: isScanActive },
     ];
-  } else if (role === "karyawan_tif" && !isPj) {
-    // 3. KARYAWAN TIF BIASA: Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Import, Export, Audit, AR
+  } else if (role === "karyawan_tif") {
+    // KARYAWAN TIF: Dashboard, Perangkat, Modul, Lokasi, Mutasi Modul, Import Data, Export Data, Audit Log, Scan
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: isDashboardActive },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices", active: isPerangkatActive },
       { id: "modul", label: "Modul", icon: "memory", href: "/modules/", active: isModulActive },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations", active: isLokasiActive },
-      { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
+      { id: "mutasi-modul", label: "Mutasi Modul", icon: "assignment", href: "/modules/requests", active: isMutasiActive },
       { id: "import", label: "Import Data", icon: "upload_file", href: "/import/", active: isImportActive },
       { id: "export", label: "Export Data", icon: "download", href: "/export/", active: isExportActive },
-      { id: "audit", label: "Audit Log", icon: "history", href: "/audit/" },
-      { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
+      { id: "audit", label: "Audit Log", icon: "history", href: "/audit/", active: isAuditActive },
+      { id: "scan", label: "Scan", icon: "view_in_ar", href: "/ar/", active: isScanActive },
     ];
   } else {
-    // 1. ADMIN: Dashboard, Perangkat, Modul, Lokasi, Pengajuan, Kelola User, Daftarkan Karyawan, Import, Export, Audit, AR
+    // SUPER ADMIN (admin): Dashboard, Perangkat, Modul, Lokasi, Mutasi Modul, Kelola User, Import Data, Export Data, Audit Log, Scan (10 items)
     navItems = [
       { id: "dashboard", label: "Dashboard", icon: "dashboard", href: "/", active: isDashboardActive },
       { id: "perangkat", label: "Perangkat", icon: "router", href: "/device/devices", active: isPerangkatActive },
       { id: "modul", label: "Modul", icon: "memory", href: "/modules/", active: isModulActive },
       { id: "lokasi", label: "Lokasi", icon: "location_on", href: "/device/locations", active: isLokasiActive },
-      { id: "pengajuan", label: "Pengajuan Modul", icon: "assignment", href: "/modules/requests" },
-      { id: "kelola-user", label: "Kelola User", icon: "manage_accounts", href: "/auth/admin/users" },
-      { id: "daftarkan-karyawan", label: "Daftarkan Karyawan", icon: "badge", href: "/auth/admin/register-karyawan" },
+      { id: "mutasi-modul", label: "Mutasi Modul", icon: "assignment", href: "/modules/requests", active: isMutasiActive },
+      { id: "kelola-user", label: "Kelola User", icon: "manage_accounts", href: "/auth/admin/users", active: isKelolaUserActive },
       { id: "import", label: "Import Data", icon: "upload_file", href: "/import/", active: isImportActive },
       { id: "export", label: "Export Data", icon: "download", href: "/export/", active: isExportActive },
-      { id: "audit", label: "Audit Log", icon: "history", href: "/audit/" },
-      { id: "ar", label: "AR/VR", icon: "view_in_ar", href: "/ar/" },
+      { id: "audit", label: "Audit Log", icon: "history", href: "/audit/", active: isAuditActive },
+      { id: "scan", label: "Scan", icon: "view_in_ar", href: "/ar/", active: isScanActive },
     ];
   }
 

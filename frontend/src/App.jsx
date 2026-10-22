@@ -13,7 +13,7 @@ import TeknisiRecentRequests from "./components/TeknisiRecentRequests";
 import AvatarModal from "./components/AvatarModal";
 import LogoutModal from "./components/LogoutModal";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import UsersPage from "./pages/UsersPage";
 import ModulesPage from "./pages/ModulesPage";
 import LocationsPage from "./pages/LocationsPage";
 import DevicesPage from "./pages/DevicesPage";
@@ -27,9 +27,12 @@ export default function App() {
     return <LoginPage />;
   }
   if (path === "/auth/register" || path === "/auth/register/") {
-    return <RegisterPage />;
+    // Pendaftaran mandiri telah dihapus, alihkan ke login
+    window.location.href = "/auth/login";
+    return null;
   }
 
+  const isUsersPage = path.startsWith("/auth/admin/users") || path.startsWith("/auth/admin/register-karyawan");
   const isModulesPage = path.startsWith("/modules");
   const isLocationsPage = path.startsWith("/device/locations");
   const isDevicesPage = path.startsWith("/device/devices") || path === "/devices";
@@ -83,10 +86,10 @@ export default function App() {
 
   useEffect(() => {
     fetchUser();
-    if (!isModulesPage && !isLocationsPage && !isDevicesPage && !isImportPage && !isExportPage) {
+    if (!isModulesPage && !isLocationsPage && !isDevicesPage && !isImportPage && !isExportPage && !isUsersPage) {
       fetchStats("30d");
     }
-  }, [isModulesPage, isLocationsPage, isDevicesPage, isImportPage, isExportPage]);
+  }, [isModulesPage, isLocationsPage, isDevicesPage, isImportPage, isExportPage, isUsersPage]);
 
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);
@@ -121,7 +124,16 @@ export default function App() {
 
         {/* Main Content: Only this area scrolls */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-5 custom-scrollbar">
-          {isModulesPage ? (
+          {isUsersPage ? (
+            /* ======================================================== */
+            /* HALAMAN KELOLA USER (INTEGRASI DAFTARKAN KARYAWAN)        */
+            /* ======================================================== */
+            <UsersPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isModulesPage ? (
             /* ======================================================== */
             /* HALAMAN MODUL (REDESIGN SESUAI GAMBAR REFERENSI USER)     */
             /* ======================================================== */
@@ -174,28 +186,18 @@ export default function App() {
               {/* Welcome Banner */}
               <HeroBanner userName={user?.name} userRole={user?.role} />
 
-              {isTeknisi ? (
-                /* DASHBOARD TEKNISI */
-                <>
-                  <TeknisiKpiCards data={stats?.teknisi} />
-                  <TeknisiRecentRequests requests={stats?.teknisi?.recent_requests} />
-                </>
-              ) : (
-                /* DASHBOARD ADMIN & KARYAWAN TIF */
-                <>
-                  <KpiCards kpi={stats?.kpi} />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <DeviceDistributionChart data={stats?.device_distribution} />
-                    <ModuleConditionChart data={stats?.module_conditions} />
-                  </div>
-                  <MovementTrendChart
-                    data={stats?.movement_trend}
-                    currentPeriod={period}
-                    onPeriodChange={handlePeriodChange}
-                  />
-                  <RecentActivities activities={stats?.recent_activities} />
-                </>
-              )}
+              {/* Dashboard Utama (KPI, Distribusi Perangkat, Kondisi Modul, Tren, Aktivitas Sistem) */}
+              <KpiCards kpi={stats?.kpi} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <DeviceDistributionChart data={stats?.device_distribution} />
+                <ModuleConditionChart data={stats?.module_conditions} />
+              </div>
+              <MovementTrendChart
+                data={stats?.movement_trend}
+                currentPeriod={period}
+                onPeriodChange={handlePeriodChange}
+              />
+              <RecentActivities activities={stats?.recent_activities} />
             </>
           )}
         </main>

@@ -32,6 +32,33 @@
       }
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      #profileTriggerBtn {
+        margin: 0 !important;
+        padding: 4px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+      }
+      #profileTriggerBtn:hover {
+        box-shadow: none !important;
+      }
+      html.dark #profileTriggerBtn:hover {
+        background: #0D1F36 !important;
+        box-shadow: none !important;
+      }
+      html:not(.dark) #profileTriggerBtn:hover,
+      html.light #profileTriggerBtn:hover {
+        background: #f1f5f9 !important;
+        box-shadow: none !important;
+      }
+      #profileTriggerBtn:focus,
+      #profileTriggerBtn:active {
+        box-shadow: none !important;
+        outline: none !important;
+      }
+    </style>
     <script>
       (function() {
         const savedTheme = localStorage.getItem('asset-app-theme') || 'dark';
@@ -72,45 +99,32 @@
             <span>Dashboard</span>
           </a>
 
-          {% if current_user.role in ['admin', 'karyawan_tif'] %}
           <a href="{{ url_for('device.devices') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/device/devices') or p.startswith('/devices') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/device/devices') or p.startswith('/devices') %}text-white{% else %}text-[#64748B]{% endif %}">router</span>
             <span>Perangkat</span>
           </a>
-          {% endif %}
 
           <a href="{{ url_for('module_request.inventory') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/modules') and not p.startswith('/modules/requests') and not p.startswith('/modules/new') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/modules') and not p.startswith('/modules/requests') and not p.startswith('/modules/new') %}text-white{% else %}text-[#64748B]{% endif %}">memory</span>
             <span>Modul</span>
           </a>
 
-          {% if current_user.role in ['admin', 'karyawan_tif'] %}
           <a href="{{ url_for('device.locations') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/device/locations') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/device/locations') %}text-white{% else %}text-[#64748B]{% endif %}">location_on</span>
             <span>Lokasi</span>
           </a>
-          {% endif %}
 
+          {% if current_user.role in ['admin', 'karyawan_tif'] %}
           <a href="{{ url_for('module_request.list_requests') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/modules/requests') or p.startswith('/modules/new') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/modules/requests') or p.startswith('/modules/new') %}text-white{% else %}text-[#64748B]{% endif %}">assignment</span>
-            <span>{% if current_user.role == 'teknisi' %}Pengajuan Perpindahan{% else %}Pengajuan Modul{% endif %}</span>
+            <span>Mutasi Modul</span>
           </a>
+          {% endif %}
 
           {% if current_user.role == 'admin' %}
           <a href="{{ url_for('auth.manage_users') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/auth/admin/users') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/auth/admin/users') %}text-white{% else %}text-[#64748B]{% endif %}">manage_accounts</span>
             <span>Kelola User</span>
-          </a>
-          <a href="{{ url_for('auth.register_karyawan') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/auth/admin/register-karyawan') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
-            <span class="material-symbols-outlined text-[19px] {% if p.startswith('/auth/admin/register-karyawan') %}text-white{% else %}text-[#64748B]{% endif %}">badge</span>
-            <span>Daftarkan Karyawan</span>
-          </a>
-          {% endif %}
-
-          {% if current_user.role == 'karyawan_tif' and current_user.is_pj %}
-          <a href="{{ url_for('auth.register_teknisi') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/auth/register-teknisi') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
-            <span class="material-symbols-outlined text-[19px] {% if p.startswith('/auth/register-teknisi') %}text-white{% else %}text-[#64748B]{% endif %}">person_add</span>
-            <span>Daftarkan Teknisi</span>
           </a>
           {% endif %}
 
@@ -131,7 +145,7 @@
 
           <a href="{{ url_for('ar.scan') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 {% if p.startswith('/ar') %}bg-[#1677FF] text-white shadow-lg shadow-[#1677FF]/25 font-semibold{% else %}text-[#94A3B8] hover:text-[#E6EDF7] hover:bg-[#0D1F36] font-medium{% endif %}">
             <span class="material-symbols-outlined text-[19px] {% if p.startswith('/ar') %}text-white{% else %}text-[#64748B]{% endif %}">view_in_ar</span>
-            <span>AR/VR</span>
+            <span>Scan</span>
           </a>
         </nav>
       </div>
@@ -169,20 +183,66 @@
 
           <!-- User Profile -->
           {% if current_user.is_authenticated %}
-          <div class="flex items-center gap-2.5 p-1 rounded-full">
-            <div class="relative shrink-0">
-              <img src="{{ current_user.avatar_url or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}" alt="{{ current_user.name }}" class="w-9 h-9 rounded-full object-cover ring-2 shadow-sm ring-[#1677FF]">
-              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
-            </div>
-            <div class="flex flex-col text-left justify-center min-w-0 pr-1">
-              <span class="text-xs font-semibold max-w-[130px] truncate text-slate-800 dark:text-[#E6EDF7]">{{ current_user.name }}</span>
-              <span class="text-[11px] leading-none mt-0.5 capitalize text-blue-600 dark:text-[#38BDF8]">{{ current_user.role|replace('_', ' ') }}{% if current_user.is_pj %} · PJ{% endif %}</span>
+          <div class="relative" id="profile-container">
+            <button type="button" id="profileTriggerBtn" onclick="toggleProfileDropdown()" class="flex items-center gap-2.5 p-1 rounded-full transition-colors cursor-pointer hover:bg-slate-100 dark:hover:bg-[#0D1F36]">
+              <div class="relative shrink-0">
+                <img src="{{ current_user.avatar_url or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}" alt="{{ current_user.name }}" class="w-9 h-9 rounded-full object-cover ring-2 shadow-sm ring-[#1677FF]">
+                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+              </div>
+              <div class="flex flex-col text-left justify-center min-w-0 pr-1">
+                <div class="flex items-center gap-1 leading-tight">
+                  <span class="text-xs font-semibold max-w-[130px] truncate text-slate-800 dark:text-[#E6EDF7]">{{ current_user.name }}</span>
+                  <span id="profile-chevron" class="material-symbols-outlined text-[17px] text-slate-500 dark:text-[#94A3B8] transition-transform duration-200">expand_more</span>
+                </div>
+                <span class="text-[11px] leading-none mt-0.5 capitalize text-blue-600 dark:text-[#38BDF8]">{{ current_user.role|replace('_', ' ') }}</span>
+              </div>
+            </button>
+
+            <!-- User Profile Dropdown Card -->
+            <div id="userProfileDropdown" class="hidden absolute right-0 top-12 mt-2 w-[340px] rounded-2xl shadow-2xl p-5 z-50 border backdrop-blur-md transition-all duration-200 bg-white/95 dark:bg-[#0D1F36]/95 border-slate-200 dark:border-[#1E3653] text-slate-800 dark:text-[#E6EDF7]">
+              <!-- Header inside dropdown with Avatar -->
+              <div class="flex items-center gap-3.5 pb-4 border-b border-slate-100 dark:border-[#1A2E4C] relative">
+                <div class="relative group">
+                  <img src="{{ current_user.avatar_url or 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256' }}" alt="{{ current_user.name }}" class="w-12 h-12 rounded-full object-cover ring-2 shadow-md ring-[#1677FF]/40">
+                  <button type="button" onclick="document.getElementById('baseAvatarInput').click()" title="Ubah Foto Profil (Kamera / Galeri)" class="avatar-camera-btn absolute -bottom-1 -right-1 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-md border transition-transform hover:scale-110 cursor-pointer bg-[#1677FF] hover:bg-[#38BDF8] border-white dark:border-[#071426]">
+                    <span class="material-symbols-outlined text-[13px]">photo_camera</span>
+                  </button>
+                </div>
+                <div class="flex flex-col min-w-0 flex-1">
+                  <h4 class="text-sm font-semibold truncate text-slate-900 dark:text-[#E6EDF7]">{{ current_user.name }}</h4>
+                  <p class="text-[11px] font-medium leading-tight mt-0.5 capitalize text-blue-600 dark:text-[#38BDF8]">{{ current_user.role|replace('_', ' ') }}</p>
+                </div>
+              </div>
+
+              <!-- Account Information Details -->
+              <div class="py-3.5 space-y-2.5">
+                <span class="text-[10px] font-semibold tracking-wide uppercase font-mono text-slate-500 dark:text-[#94A3B8]">Informasi Akun</span>
+                <div class="rounded-xl p-3 border space-y-2 text-xs bg-slate-50 dark:bg-[#071426] border-slate-200 dark:border-[#1A2E4C]">
+                  <div class="flex items-start justify-between gap-2">
+                    <span class="text-[11px] shrink-0 text-slate-500 dark:text-[#94A3B8]">District</span>
+                    <span class="font-medium text-right truncate text-[11px] text-slate-800 dark:text-[#E6EDF7]">{{ current_user.district or "—" }}</span>
+                  </div>
+                  <div class="flex items-start justify-between gap-2 pt-1 border-t border-slate-200 dark:border-[#1A2E4C]/60">
+                    <span class="text-[11px] shrink-0 text-slate-500 dark:text-[#94A3B8]">Email</span>
+                    <span class="font-mono text-right truncate text-[11px] text-blue-600 dark:text-[#38BDF8]">{{ current_user.email }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-3 border-t border-slate-100 dark:border-[#1A2E4C] flex flex-col gap-2">
+                <button type="button" onclick="document.getElementById('baseAvatarInput').click()" class="btn-change-avatar rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition-colors cursor-pointer border bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 dark:bg-[#1677FF]/15 dark:text-[#38BDF8] dark:border-[#1677FF]/30 dark:hover:bg-[#1677FF]/25">
+                  <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                  Ganti Foto Profil
+                </button>
+                <input type="file" id="baseAvatarInput" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="uploadBaseAvatar(this)">
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/25 rounded-xl px-4 py-2 w-full flex items-center justify-center gap-2 font-medium text-xs transition duration-200 cursor-pointer shadow-sm active:scale-[0.98]">
+                  <span class="material-symbols-outlined text-[16px]">logout</span>
+                  Keluar dari akun
+                </a>
+              </div>
             </div>
           </div>
-
-          <a href="{{ url_for('auth.logout') }}" title="Keluar" class="w-9 h-9 rounded-xl flex items-center justify-center text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">logout</span>
-          </a>
           {% else %}
           <a href="{{ url_for('auth.login') }}" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1677FF] hover:bg-blue-600">Masuk</a>
           {% endif %}
@@ -222,6 +282,52 @@
         localStorage.setItem('asset-app-theme', 'dark');
       }
     });
+
+    function toggleProfileDropdown() {
+      const dd = document.getElementById('userProfileDropdown');
+      const ch = document.getElementById('profile-chevron');
+      if (!dd) return;
+      const isHidden = dd.classList.contains('hidden');
+      if (isHidden) {
+        dd.classList.remove('hidden');
+        if (ch) ch.classList.add('rotate-180');
+      } else {
+        dd.classList.add('hidden');
+        if (ch) ch.classList.remove('rotate-180');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      const container = document.getElementById('profile-container');
+      const dd = document.getElementById('userProfileDropdown');
+      const ch = document.getElementById('profile-chevron');
+      if (container && dd && !container.contains(e.target)) {
+        dd.classList.add('hidden');
+        if (ch) ch.classList.remove('rotate-180');
+      }
+    });
+
+    function uploadBaseAvatar(input) {
+      if (!input.files || !input.files[0]) return;
+      const formData = new FormData();
+      formData.append('avatar', input.files[0]);
+      fetch('/api/me/avatar', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.avatar_url) {
+          window.location.reload();
+        } else {
+          alert(data.error || 'Gagal mengunggah foto profil');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan saat mengunggah foto profil');
+      });
+    }
   </script>
 </body>
 </html>

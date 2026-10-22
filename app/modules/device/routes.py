@@ -7,7 +7,7 @@ Rute yang tersedia:
   GET/POST /device/locations                       -> Admin/Karyawan TIF kelola Location
   GET/POST /device/devices                         -> Admin/Karyawan TIF kelola Devices, dengan filter (FR-3.2)
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 
 from ...extensions import db
@@ -82,9 +82,11 @@ def slot_definitions(device_type_id):
 
 @device_bp.route("/locations", methods=["GET", "POST"])
 @login_required
-@role_required("admin", "karyawan_tif")
+@role_required("admin", "karyawan_tif", "teknisi")
 def locations():
     if request.method == "POST":
+        if current_user.role not in ["admin", "karyawan_tif"]:
+            abort(403)
         nama_lokasi = request.form.get("nama_lokasi", "").strip()
         alamat = request.form.get("alamat", "").strip()
         district = request.form.get("district", "").strip()
@@ -143,7 +145,7 @@ def locations():
 
 @device_bp.route("/devices", methods=["GET", "POST"])
 @login_required
-@role_required("admin", "karyawan_tif")
+@role_required("admin", "karyawan_tif", "teknisi")
 def devices():
     if request.method == "GET":
         import os
@@ -153,6 +155,8 @@ def devices():
             return render_template("react_index.html", current_user=current_user)
 
     if request.method == "POST":
+        if current_user.role not in ["admin", "karyawan_tif"]:
+            abort(403)
         device_type_id = request.form.get("device_type_id")
         location_id = request.form.get("location_id")
         nama_perangkat = request.form.get("nama_perangkat", "").strip()

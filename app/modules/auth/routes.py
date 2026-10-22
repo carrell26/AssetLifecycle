@@ -7,9 +7,8 @@ Rute yang tersedia:
   GET/POST /auth/register           -> self-registration Teknisi (FR-1.2), status jadi 'pending'
   GET/POST /auth/register-teknisi   -> Karyawan TIF daftarkan Teknisi baru (FR-1.4), langsung 'aktif'
   GET/POST /auth/admin/register-karyawan  -> Admin daftarkan Karyawan TIF (FR-1.3)
-  GET      /auth/admin/users        -> Admin lihat & kelola semua user (approve pending, toggle is_pj)
+  GET      /auth/admin/users        -> Admin lihat & kelola semua user (approve pending)
   POST     /auth/admin/users/<id>/approve  -> Admin approve akun Teknisi yang masih pending
-  POST     /auth/admin/users/<id>/toggle-pj -> Admin tandai/lepas status PJ pada Karyawan TIF (FR-1.5)
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
@@ -80,109 +79,20 @@ def logout():
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
-    """Self-registration untuk Teknisi (FR-1.2) via React SPA."""
+    """Halaman register mandiri telah dinonaktifkan. Pembuatan akun dilakukan oleh Admin."""
     if current_user.is_authenticated:
         return redirect(url_for("index"))
-
-    if request.method == "POST":
-        data = request.get_json(silent=True) or request.form
-        name = (data.get("name") or "").strip()
-        email = (data.get("email") or "").strip()
-        password = data.get("password") or ""
-        confirm_password = data.get("confirm_password") or ""
-        district = (data.get("district") or "").strip()
-        is_json = request.is_json or request.headers.get("Content-Type") == "application/json"
-
-        if not name or not email or not password or not district:
-            if is_json:
-                return jsonify(success=False, message="Semua kolom wajib diisi."), 400
-            flash("Semua kolom wajib diisi.", "error")
-            return render_template("react_index.html")
-
-        if confirm_password and password != confirm_password:
-            if is_json:
-                return jsonify(success=False, message="Konfirmasi password tidak sesuai."), 400
-            flash("Konfirmasi password tidak cocok.", "error")
-            return render_template("react_index.html")
-
-        if len(password) < 8:
-            if is_json:
-                return jsonify(success=False, message="Password minimal 8 karakter."), 400
-            flash("Password minimal 8 karakter.", "error")
-            return render_template("react_index.html")
-
-        if User.query.filter_by(email=email).first():
-            if is_json:
-                return jsonify(success=False, message="Email sudah terdaftar. Silakan gunakan email lain atau masuk."), 400
-            flash("Email sudah terdaftar.", "error")
-            return render_template("react_index.html")
-
-        user = User(
-            name=name,
-            email=email,
-            role="teknisi",
-            district=district,
-            status="pending",
-        )
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-        if is_json:
-            return jsonify(
-                success=True,
-                message="Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin sebelum dapat masuk.",
-                redirect="/auth/login",
-            )
-
-        flash("Pendaftaran berhasil. Akun kamu menunggu persetujuan Admin sebelum bisa login.", "success")
-        return redirect(url_for("auth.login"))
-
-    return render_template("react_index.html")
+    flash("Pendaftaran akun mandiri telah dinonaktifkan. Pembuatan akun hanya dapat dilakukan oleh Admin.", "info")
+    return redirect(url_for("auth.login"))
 
 
 @auth_bp.route("/register-api", methods=["POST"], endpoint="api_register")
 def api_register():
-    """API endpoint JSON untuk registrasi akun teknisi dari React."""
-    data = request.get_json(silent=True) or request.form
-    name = (data.get("name") or "").strip()
-    email = (data.get("email") or "").strip()
-    district = (data.get("district") or "").strip()
-    password = data.get("password") or ""
-    confirm_password = data.get("confirm_password") or ""
-    terms = data.get("terms")
-
-    if not name or not email or not district or not password:
-        return jsonify(success=False, message="Semua kolom wajib diisi."), 400
-
-    if not terms:
-        return jsonify(success=False, message="Anda harus menyetujui Syarat dan Ketentuan & Kebijakan Privasi."), 400
-
-    if confirm_password and password != confirm_password:
-        return jsonify(success=False, message="Konfirmasi password tidak sesuai."), 400
-
-    if len(password) < 8:
-        return jsonify(success=False, message="Password minimal 8 karakter."), 400
-
-    if User.query.filter_by(email=email).first():
-        return jsonify(success=False, message="Email sudah terdaftar. Silakan gunakan email lain atau masuk."), 400
-
-    user = User(
-        name=name,
-        email=email,
-        role="teknisi",
-        district=district,
-        status="pending",
-    )
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-
-    return jsonify(
-        success=True,
-        message="Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin sebelum dapat masuk.",
-        redirect="/auth/login",
-    )
+    """API self-registration dinonaktifkan."""
+    return jsonify({
+        "success": False,
+        "error": "Pendaftaran akun mandiri telah dinonaktifkan. Pembuatan akun hanya dapat dilakukan oleh Admin melalui menu Kelola User."
+    }), 403
 
 
 @auth_bp.route("/register-teknisi", methods=["GET", "POST"])
@@ -224,49 +134,19 @@ def register_teknisi():
 @login_required
 @role_required("admin")
 def register_karyawan():
-    """Admin daftarkan akun Karyawan TIF baru (FR-1.3)."""
-    from datetime import datetime, timezone
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "")
-        district = request.form.get("district", "").strip()
-
-        if not name or not email or not password or not district:
-            flash("Semua kolom wajib diisi.", "error")
-            recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
-            return render_template("auth/register_karyawan.html", recent_users=recent_users)
-
-        if User.query.filter_by(email=email).first():
-            flash("Email sudah terdaftar.", "error")
-            recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
-            return render_template("auth/register_karyawan.html", recent_users=recent_users)
-
-        user = User(
-            name=name,
-            email=email,
-            role="karyawan_tif",
-            district=district,
-            status="aktif",
-        )
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-        flash(f"Karyawan TIF {name} berhasil didaftarkan.", "success")
-        return redirect(url_for("auth.register_karyawan"))
-
-    recent_users = User.query.filter_by(role="karyawan_tif").order_by(User.created_at.desc()).limit(10).all()
-    return render_template("auth/register_karyawan.html", recent_users=recent_users)
+    """Menu Daftarkan Karyawan telah disatukan ke dalam menu Kelola User."""
+    return redirect(url_for("auth.manage_users"))
 
 
 @auth_bp.route("/admin/users")
 @login_required
 @role_required("admin")
 def manage_users():
-    """Admin lihat semua user, approve yang pending, toggle status PJ (FR-1.5)."""
-    users = User.query.order_by(User.created_at.desc()).all()
-    return render_template("auth/manage_users.html", users=users)
+    """Admin lihat semua user dan kelola akun via React SPA."""
+    if request.args.get("legacy") == "true":
+        users = User.query.order_by(User.created_at.desc()).all()
+        return render_template("auth/manage_users.html", users=users)
+    return render_template("react_index.html")
 
 
 @auth_bp.route("/admin/users/<int:user_id>/approve", methods=["POST"])
@@ -277,20 +157,4 @@ def approve_user(user_id):
     user.status = "aktif"
     db.session.commit()
     flash(f"Akun {user.name} sudah diaktifkan.", "success")
-    return redirect(url_for("auth.manage_users"))
-
-
-@auth_bp.route("/admin/users/<int:user_id>/toggle-pj", methods=["POST"])
-@login_required
-@role_required("admin")
-def toggle_pj(user_id):
-    user = User.query.get_or_404(user_id)
-    if user.role != "karyawan_tif":
-        flash("Status PJ hanya berlaku untuk Karyawan TIF.", "error")
-        return redirect(url_for("auth.manage_users"))
-
-    user.is_pj = not user.is_pj
-    db.session.commit()
-    status_text = "ditandai sebagai PJ" if user.is_pj else "dilepas status PJ-nya"
-    flash(f"{user.name} {status_text}.", "success")
     return redirect(url_for("auth.manage_users"))

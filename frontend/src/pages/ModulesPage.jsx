@@ -577,14 +577,16 @@ export default function ModulesPage({ user, searchValue, onSearchChange }) {
           </div>
 
           {/* Right: Pasang Modul Baru Button (Hanya 1 ikon plus, tanpa dobel +) */}
-          <button
-            type="button"
-            onClick={() => setCreateModalOpen(true)}
-            className="h-11 px-5 rounded-xl bg-[#1677FF] hover:bg-[#0E65D9] text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#1677FF]/30 transition-all duration-200 hover:shadow-[#1677FF]/50 active:scale-[0.98] cursor-pointer shrink-0"
-          >
-            <span className="material-symbols-outlined text-[19px]">add</span>
-            <span>Pasang Modul Baru</span>
-          </button>
+          {user?.role !== "teknisi" && (
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(true)}
+              className="h-11 px-5 rounded-xl bg-[#1677FF] hover:bg-[#0E65D9] text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#1677FF]/30 transition-all duration-200 hover:shadow-[#1677FF]/50 active:scale-[0.98] cursor-pointer shrink-0"
+            >
+              <span className="material-symbols-outlined text-[19px]">add</span>
+              <span>Pasang Modul Baru</span>
+            </button>
+          )}
         </div>
 
         {/* Sub-header: Total baris info banner (Ukuran tetap tanpa pergeseran layout) */}
@@ -876,36 +878,40 @@ export default function ModulesPage({ user, searchValue, onSearchChange }) {
                         </button>
 
                         {/* Edit Action */}
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEdit(item)}
-                          title="Edit Modul"
-                          className={`w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] p-0 shrink-0 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shadow-sm ${
-                            isDark
-                              ? "bg-[#3D2C0D] hover:bg-[#523B11] text-[#FBBF24] border-[#5E4413]"
-                              : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[17px] leading-none select-none flex items-center justify-center pointer-events-none">
-                            edit
-                          </span>
-                        </button>
+                        {user?.role !== "teknisi" && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(item)}
+                            title="Edit Modul"
+                            className={`w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] p-0 shrink-0 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shadow-sm ${
+                              isDark
+                                ? "bg-[#3D2C0D] hover:bg-[#523B11] text-[#FBBF24] border-[#5E4413]"
+                                : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[17px] leading-none select-none flex items-center justify-center pointer-events-none">
+                              edit
+                            </span>
+                          </button>
+                        )}
 
                         {/* Delete Action */}
-                        <button
-                          type="button"
-                          onClick={() => handleOpenDelete(item)}
-                          title="Hapus Modul"
-                          className={`w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] p-0 shrink-0 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shadow-sm ${
-                            isDark
-                              ? "bg-[#3C1318] hover:bg-[#541B22] text-[#F43F5E] border-[#5C1D25]"
-                              : "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[17px] leading-none select-none flex items-center justify-center pointer-events-none">
-                            delete
-                          </span>
-                        </button>
+                        {user?.role !== "teknisi" && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDelete(item)}
+                            title="Hapus Modul"
+                            className={`w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] p-0 shrink-0 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shadow-sm ${
+                              isDark
+                                ? "bg-[#3C1318] hover:bg-[#541B22] text-[#F43F5E] border-[#5C1D25]"
+                                : "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[17px] leading-none select-none flex items-center justify-center pointer-events-none">
+                              delete
+                            </span>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

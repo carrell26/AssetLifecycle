@@ -4,11 +4,7 @@
 <div class="card">
     <h1>Ajukan perubahan modul</h1>
     <p class="subtitle">
-        {% if current_user.role == "teknisi" %}
-            Pengajuan kamu akan menunggu persetujuan PJ district {{ current_user.district }}.
-        {% else %}
-            Pengajuan kamu langsung tercatat otomatis (auto-approved).
-        {% endif %}
+        Catat perpindahan modul perangkat secara langsung.
     </p>
 
     <form method="POST">

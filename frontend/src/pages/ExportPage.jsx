@@ -1,5 +1,19 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
+import {
+  Settings,
+  Eye,
+  MapPin,
+  Server,
+  Cpu,
+  Calendar,
+  ChevronDown,
+  Info,
+  Plus,
+  CheckCircle2,
+  AlertCircle,
+  X,
+} from "lucide-react";
 
 export default function ExportPage({ user }) {
   const { isDark } = useTheme();
@@ -14,6 +28,10 @@ export default function ExportPage({ user }) {
   const [selectedModuleTypeId, setSelectedModuleTypeId] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  // Refs for Date Inputs
+  const dateFromRef = useRef(null);
+  const dateToRef = useRef(null);
 
   // Summary & Format States
   const [totalMovements, setTotalMovements] = useState(0);
@@ -33,7 +51,7 @@ export default function ExportPage({ user }) {
     }, 4500);
   };
 
-  // Fetch initial master data & count
+  // Fetch initial master data & count from backend API
   const fetchFilterData = useCallback(async (isInitial = false) => {
     try {
       if (isInitial) setLoading(true);
@@ -157,45 +175,43 @@ export default function ExportPage({ user }) {
               : "bg-rose-50 border-rose-400 text-rose-700 shadow-lg"
           }`}
         >
-          <span className="material-symbols-outlined text-[20px]">
-            {toast.type === "success"
-              ? "check_circle"
-              : toast.type === "info"
-              ? "info"
-              : "error"}
-          </span>
+          {toast.type === "success" ? (
+            <CheckCircle2 className="w-5 h-5" />
+          ) : toast.type === "info" ? (
+            <Info className="w-5 h-5" />
+          ) : (
+            <AlertCircle className="w-5 h-5" />
+          )}
           <span className="text-xs font-semibold">{toast.message}</span>
           <button
             type="button"
             onClick={() => setToast(null)}
             className="ml-2 hover:opacity-75 cursor-pointer text-xs"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* 2-Column Layout Sesuai Screenshot Referensi */}
+      {/* 2-Column Layout Sesuai Patokan Desain Gambar 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         {/* ======================================================== */}
         {/* KOLOM KIRI: FILTER EXPORT                                */}
         {/* ======================================================== */}
         <div
-          className={`rounded-2xl border p-6 transition-all duration-300 flex flex-col justify-between ${
+          className={`rounded-2xl border p-6 transition-all duration-300 flex flex-col justify-between h-full ${
             isDark
-              ? "bg-[#0D1F36] border-[#1E3A5F] shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
+              ? "bg-[#09172B] border-[#133A63] shadow-[0_8px_32px_rgba(0,0,0,0.45),0_0_20px_rgba(14,64,115,0.15)]"
               : "bg-white border-slate-200 shadow-sm"
           }`}
         >
           <div>
             {/* Header Filter Export */}
             <div className="flex items-center gap-2.5 mb-5">
-              <span className="material-symbols-outlined text-[22px] text-[#38BDF8]">
-                settings
-              </span>
+              <Settings className="w-5 h-5 text-[#38BDF8]" />
               <h2
-                className={`text-base font-bold tracking-tight ${
-                  isDark ? "text-[#E6EDF7]" : "text-slate-800"
+                className={`text-[15px] font-bold tracking-tight ${
+                  isDark ? "text-[#F1F5F9]" : "text-slate-800"
                 }`}
               >
                 Filter Export
@@ -206,8 +222,8 @@ export default function ExportPage({ user }) {
             <div
               className={`rounded-2xl border p-5 space-y-4 transition-colors ${
                 isDark
-                  ? "bg-[#071426]/75 border-[#1E3A5F]"
-                  : "bg-slate-50/70 border-slate-200"
+                  ? "bg-[#061222]/95 border-[#143255]"
+                  : "bg-slate-50 border-slate-200"
               }`}
             >
               {/* Field 1: Lokasi */}
@@ -215,109 +231,115 @@ export default function ExportPage({ user }) {
                 <label
                   htmlFor="export-location"
                   className={`block text-xs font-semibold mb-1.5 ${
-                    isDark ? "text-[#94A3B8]" : "text-slate-600"
+                    isDark ? "text-[#8FA0B5]" : "text-slate-600"
                   }`}
                 >
                   Lokasi
                 </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-[#64748B] pointer-events-none">
-                    location_on
-                  </span>
+                <div className="relative flex items-center">
+                  <MapPin className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#476A8F] pointer-events-none" />
                   <select
                     id="export-location"
                     value={selectedLocationId}
                     onChange={(e) => setSelectedLocationId(e.target.value)}
                     className={`w-full h-11 pl-10 pr-9 rounded-xl border text-xs font-medium transition-all appearance-none cursor-pointer outline-none ${
                       isDark
-                        ? "bg-[#0B172B] border-[#1E3A5F] text-[#E6EDF7] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-                        : "bg-white border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        ? "bg-[#071629] border-[#163861] text-[#C5D3E8] hover:border-[#225088] focus:border-[#0088FF] focus:ring-1 focus:ring-[#0088FF]"
+                        : "bg-white border-slate-300 text-slate-800 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     }`}
                   >
-                    <option value="">Semua lokasi</option>
+                    <option value="" className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}>
+                      Semua lokasi
+                    </option>
                     {locations.map((loc) => (
-                      <option key={loc.location_id} value={loc.location_id}>
+                      <option
+                        key={loc.location_id}
+                        value={loc.location_id}
+                        className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}
+                      >
                         {loc.nama_lokasi}
                       </option>
                     ))}
                   </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-[#64748B] pointer-events-none">
-                    expand_more
-                  </span>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6F86] pointer-events-none" />
                 </div>
               </div>
 
-              {/* Field 2: Tipe Perangkat */}
+              {/* Field 2: Tipe Perangkat (Icon Server Rack) */}
               <div>
                 <label
                   htmlFor="export-device-type"
                   className={`block text-xs font-semibold mb-1.5 ${
-                    isDark ? "text-[#94A3B8]" : "text-slate-600"
+                    isDark ? "text-[#8FA0B5]" : "text-slate-600"
                   }`}
                 >
                   Tipe Perangkat
                 </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-[#64748B] pointer-events-none">
-                    router
-                  </span>
+                <div className="relative flex items-center">
+                  <Server className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#476A8F] pointer-events-none" />
                   <select
                     id="export-device-type"
                     value={selectedDeviceTypeId}
                     onChange={(e) => setSelectedDeviceTypeId(e.target.value)}
                     className={`w-full h-11 pl-10 pr-9 rounded-xl border text-xs font-medium transition-all appearance-none cursor-pointer outline-none ${
                       isDark
-                        ? "bg-[#0B172B] border-[#1E3A5F] text-[#E6EDF7] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-                        : "bg-white border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        ? "bg-[#071629] border-[#163861] text-[#C5D3E8] hover:border-[#225088] focus:border-[#0088FF] focus:ring-1 focus:ring-[#0088FF]"
+                        : "bg-white border-slate-300 text-slate-800 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     }`}
                   >
-                    <option value="">Semua tipe perangkat</option>
+                    <option value="" className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}>
+                      Semua tipe perangkat
+                    </option>
                     {deviceTypes.map((type) => (
-                      <option key={type.device_type_id} value={type.device_type_id}>
+                      <option
+                        key={type.device_type_id}
+                        value={type.device_type_id}
+                        className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}
+                      >
                         {type.nama_tipe}
                       </option>
                     ))}
                   </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-[#64748B] pointer-events-none">
-                    expand_more
-                  </span>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6F86] pointer-events-none" />
                 </div>
               </div>
 
-              {/* Field 3: Tipe Modul */}
+              {/* Field 3: Tipe Modul (Icon CPU Microchip) */}
               <div>
                 <label
                   htmlFor="export-module-type"
                   className={`block text-xs font-semibold mb-1.5 ${
-                    isDark ? "text-[#94A3B8]" : "text-slate-600"
+                    isDark ? "text-[#8FA0B5]" : "text-slate-600"
                   }`}
                 >
                   Tipe Modul
                 </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-[#64748B] pointer-events-none">
-                    memory
-                  </span>
+                <div className="relative flex items-center">
+                  <Cpu className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#476A8F] pointer-events-none" />
                   <select
                     id="export-module-type"
                     value={selectedModuleTypeId}
                     onChange={(e) => setSelectedModuleTypeId(e.target.value)}
                     className={`w-full h-11 pl-10 pr-9 rounded-xl border text-xs font-medium transition-all appearance-none cursor-pointer outline-none ${
                       isDark
-                        ? "bg-[#0B172B] border-[#1E3A5F] text-[#E6EDF7] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-                        : "bg-white border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        ? "bg-[#071629] border-[#163861] text-[#C5D3E8] hover:border-[#225088] focus:border-[#0088FF] focus:ring-1 focus:ring-[#0088FF]"
+                        : "bg-white border-slate-300 text-slate-800 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     }`}
                   >
-                    <option value="">Semua tipe modul</option>
+                    <option value="" className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}>
+                      Semua tipe modul
+                    </option>
                     {moduleTypes.map((mt) => (
-                      <option key={mt.module_type_id} value={mt.module_type_id}>
+                      <option
+                        key={mt.module_type_id}
+                        value={mt.module_type_id}
+                        className={isDark ? "bg-[#071629] text-[#C5D3E8]" : "bg-white text-slate-800"}
+                      >
                         {mt.nama_tipe}
                       </option>
                     ))}
                   </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-[#64748B] pointer-events-none">
-                    expand_more
-                  </span>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6F86] pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -326,62 +348,78 @@ export default function ExportPage({ user }) {
             <div
               className={`mt-4 rounded-2xl border p-5 transition-colors ${
                 isDark
-                  ? "bg-[#071426]/75 border-[#1E3A5F]"
-                  : "bg-slate-50/70 border-slate-200"
+                  ? "bg-[#061222]/95 border-[#143255]"
+                  : "bg-slate-50 border-slate-200"
               }`}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Dari Tanggal */}
+                {/* Dari Tanggal: SATU-SATUNYA IKON DI KIRI, WARNA SESUAI TEMA */}
                 <div>
                   <label
                     htmlFor="export-date-from"
                     className={`block text-xs font-semibold mb-1.5 ${
-                      isDark ? "text-[#94A3B8]" : "text-slate-600"
+                      isDark ? "text-[#8FA0B5]" : "text-slate-600"
                     }`}
                   >
                     Dari Tanggal
                   </label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-[#64748B] pointer-events-none">
-                      calendar_today
-                    </span>
+                  <div className="relative flex items-center group">
+                    <Calendar
+                      className={`w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${
+                        isDark ? "text-[#476A8F] group-hover:text-[#38BDF8]" : "text-slate-400 group-hover:text-blue-500"
+                      }`}
+                    />
                     <input
                       type="date"
                       id="export-date-from"
+                      ref={dateFromRef}
                       value={dateFrom}
                       onChange={(e) => setDateFrom(e.target.value)}
-                      className={`w-full h-11 pl-10 pr-3 rounded-xl border text-xs font-medium transition-all outline-none cursor-pointer ${
+                      onClick={(e) => {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch (err) {}
+                      }}
+                      className={`export-date-input w-full h-11 pl-10 pr-3 rounded-xl border text-xs font-medium transition-all outline-none cursor-pointer ${
                         isDark
-                          ? "bg-[#0B172B] border-[#1E3A5F] text-[#E6EDF7] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-                          : "bg-white border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          ? "bg-[#071629] border-[#163861] text-[#C5D3E8] hover:border-[#225088] focus:border-[#0088FF] focus:ring-1 focus:ring-[#0088FF]"
+                          : "bg-white border-slate-300 text-slate-800 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       }`}
                     />
                   </div>
                 </div>
 
-                {/* Sampai Tanggal */}
+                {/* Sampai Tanggal: SATU-SATUNYA IKON DI KIRI, WARNA SESUAI TEMA */}
                 <div>
                   <label
                     htmlFor="export-date-to"
                     className={`block text-xs font-semibold mb-1.5 ${
-                      isDark ? "text-[#94A3B8]" : "text-slate-600"
+                      isDark ? "text-[#8FA0B5]" : "text-slate-600"
                     }`}
                   >
                     Sampai Tanggal
                   </label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-[#64748B] pointer-events-none">
-                      calendar_today
-                    </span>
+                  <div className="relative flex items-center group">
+                    <Calendar
+                      className={`w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${
+                        isDark ? "text-[#476A8F] group-hover:text-[#38BDF8]" : "text-slate-400 group-hover:text-blue-500"
+                      }`}
+                    />
                     <input
                       type="date"
                       id="export-date-to"
+                      ref={dateToRef}
                       value={dateTo}
                       onChange={(e) => setDateTo(e.target.value)}
-                      className={`w-full h-11 pl-10 pr-3 rounded-xl border text-xs font-medium transition-all outline-none cursor-pointer ${
+                      onClick={(e) => {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch (err) {}
+                      }}
+                      className={`export-date-input w-full h-11 pl-10 pr-3 rounded-xl border text-xs font-medium transition-all outline-none cursor-pointer ${
                         isDark
-                          ? "bg-[#0B172B] border-[#1E3A5F] text-[#E6EDF7] focus:border-[#1677FF] focus:ring-1 focus:ring-[#1677FF]"
-                          : "bg-white border-slate-300 text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          ? "bg-[#071629] border-[#163861] text-[#C5D3E8] hover:border-[#225088] focus:border-[#0088FF] focus:ring-1 focus:ring-[#0088FF]"
+                          : "bg-white border-slate-300 text-slate-800 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       }`}
                     />
                   </div>
@@ -395,21 +433,19 @@ export default function ExportPage({ user }) {
         {/* KOLOM KANAN: PRATINJAU & RINGKASAN                       */}
         {/* ======================================================== */}
         <div
-          className={`rounded-2xl border p-6 transition-all duration-300 flex flex-col justify-between ${
+          className={`rounded-2xl border p-6 transition-all duration-300 flex flex-col justify-between h-full ${
             isDark
-              ? "bg-[#0D1F36] border-[#1E3A5F] shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
+              ? "bg-[#09172B] border-[#133A63] shadow-[0_8px_32px_rgba(0,0,0,0.45),0_0_20px_rgba(14,64,115,0.15)]"
               : "bg-white border-slate-200 shadow-sm"
           }`}
         >
           <div>
             {/* Header Pratinjau & Ringkasan */}
             <div className="flex items-center gap-2.5 mb-5">
-              <span className="material-symbols-outlined text-[22px] text-[#38BDF8]">
-                visibility
-              </span>
+              <Eye className="w-5 h-5 text-[#38BDF8]" />
               <h2
-                className={`text-base font-bold tracking-tight ${
-                  isDark ? "text-[#E6EDF7]" : "text-slate-800"
+                className={`text-[15px] font-bold tracking-tight ${
+                  isDark ? "text-[#F1F5F9]" : "text-slate-800"
                 }`}
               >
                 Pratinjau &amp; Ringkasan
@@ -420,8 +456,8 @@ export default function ExportPage({ user }) {
             <div
               className={`rounded-2xl border p-6 transition-colors ${
                 isDark
-                  ? "bg-[#071426]/75 border-[#1E3A5F]"
-                  : "bg-slate-50/70 border-slate-200"
+                  ? "bg-[#061222]/95 border-[#143255]"
+                  : "bg-slate-50 border-slate-200"
               }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
@@ -429,12 +465,12 @@ export default function ExportPage({ user }) {
                 <div className="flex flex-col justify-center">
                   <span
                     className={`text-xs font-semibold ${
-                      isDark ? "text-[#94A3B8]" : "text-slate-500"
+                      isDark ? "text-[#8FA0B5]" : "text-slate-500"
                     }`}
                   >
                     Pratinjau Status Riwayat
                   </span>
-                  <div className="text-5xl font-black text-[#38BDF8] tracking-tight my-2">
+                  <div className="text-[52px] font-black text-[#00BFFF] tracking-tight my-1.5 leading-none">
                     {loading ? (
                       <span className="animate-pulse opacity-60">...</span>
                     ) : (
@@ -443,7 +479,7 @@ export default function ExportPage({ user }) {
                   </div>
                   <span
                     className={`text-xs font-medium ${
-                      isDark ? "text-[#94A3B8]" : "text-slate-500"
+                      isDark ? "text-[#8FA0B5]" : "text-slate-500"
                     }`}
                   >
                     Total Aktivitas Tercatat
@@ -454,17 +490,15 @@ export default function ExportPage({ user }) {
                 <div
                   className={`rounded-xl p-4 border flex flex-col justify-center transition-all ${
                     isDark
-                      ? "bg-[#0B1A30]/80 border-[#1E3A5F]/80 text-[#94A3B8]"
+                      ? "bg-[#071933]/90 border-[#133A63] text-[#7E95AD]"
                       : "bg-blue-50/70 border-blue-200 text-slate-600"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="material-symbols-outlined text-[18px] text-[#38BDF8]">
-                      info
-                    </span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Info className="w-4 h-4 text-[#38BDF8] shrink-0" />
                     <span
                       className={`text-xs font-bold ${
-                        isDark ? "text-[#E6EDF7]" : "text-slate-800"
+                        isDark ? "text-[#F1F5F9]" : "text-slate-800"
                       }`}
                     >
                       Info
@@ -478,9 +512,9 @@ export default function ExportPage({ user }) {
             </div>
 
             {/* Estimasi Ukuran File */}
-            <div className="mt-6 flex items-center text-xs font-medium text-[#94A3B8]">
+            <div className="mt-6 flex items-center text-xs font-medium text-[#8FA0B5]">
               <span>Estimasi Ukuran File:&nbsp;</span>
-              <strong className={isDark ? "text-[#E6EDF7]" : "text-slate-800"}>
+              <strong className={isDark ? "text-[#F1F5F9] font-bold" : "text-slate-800 font-bold"}>
                 {estimatedSize}
               </strong>
             </div>
@@ -489,7 +523,7 @@ export default function ExportPage({ user }) {
             <div className="mt-5 flex items-center justify-between">
               <span
                 className={`text-xs font-semibold ${
-                  isDark ? "text-[#E6EDF7]" : "text-slate-700"
+                  isDark ? "text-[#F1F5F9]" : "text-slate-700"
                 }`}
               >
                 Format File
@@ -497,7 +531,7 @@ export default function ExportPage({ user }) {
               <div
                 className={`inline-flex rounded-xl p-1 border transition-colors ${
                   isDark
-                    ? "bg-[#071426] border-[#1E3A5F]"
+                    ? "bg-[#050E1B] border-[#143255]"
                     : "bg-slate-100 border-slate-300"
                 }`}
               >
@@ -507,9 +541,9 @@ export default function ExportPage({ user }) {
                   onClick={() => setFileFormat("xlsx")}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     fileFormat === "xlsx"
-                      ? "bg-[#1677FF] text-white shadow-[0_0_15px_rgba(22,119,255,0.6)]"
+                      ? "bg-[#0088FF] text-white shadow-[0_0_16px_rgba(0,136,255,0.65)]"
                       : isDark
-                      ? "text-[#94A3B8] hover:text-[#E6EDF7]"
+                      ? "text-[#64748B] hover:text-[#94A3B8]"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -521,9 +555,9 @@ export default function ExportPage({ user }) {
                   onClick={() => setFileFormat("csv")}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     fileFormat === "csv"
-                      ? "bg-[#1677FF] text-white shadow-[0_0_15px_rgba(22,119,255,0.6)]"
+                      ? "bg-[#0088FF] text-white shadow-[0_0_16px_rgba(0,136,255,0.65)]"
                       : isDark
-                      ? "text-[#94A3B8] hover:text-[#E6EDF7]"
+                      ? "text-[#64748B] hover:text-[#94A3B8]"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -534,32 +568,30 @@ export default function ExportPage({ user }) {
           </div>
 
           {/* Tombol Aksi: + Download Excel / CSV & Reset Filter */}
-          <div className="mt-8 pt-4 flex items-center justify-end gap-3 border-t border-transparent">
+          <div className="mt-8 pt-4 flex items-center justify-end gap-3.5 border-t border-transparent">
             <button
               type="button"
               id="btn-download-export"
               onClick={handleDownload}
               disabled={downloading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-[#1677FF] hover:bg-[#1677FF]/90 shadow-[0_0_20px_rgba(22,119,255,0.45)] hover:shadow-[0_0_25px_rgba(22,119,255,0.65)] active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-[#0088FF] hover:bg-[#007AE6] shadow-[0_0_20px_rgba(0,136,255,0.5)] hover:shadow-[0_0_26px_rgba(0,136,255,0.7)] active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {downloading ? "hourglass_top" : "add"}
-              </span>
+              <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>
                 {downloading
                   ? "Mengunduh..."
                   : fileFormat === "csv"
-                  ? "+ Download CSV"
-                  : "+ Download Excel"}
+                  ? "Download CSV"
+                  : "Download Excel"}
               </span>
             </button>
             <button
               type="button"
               id="btn-reset-filter"
               onClick={handleResetFilter}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer active:scale-95 ${
+              className={`px-4.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer active:scale-95 ${
                 isDark
-                  ? "bg-[#0B172B] hover:bg-[#162C4E] border-[#1E3A5F] text-[#94A3B8] hover:text-[#E6EDF7]"
+                  ? "bg-[#071629] hover:bg-[#0D2442] border-[#163861] hover:border-[#225088] text-[#8FA0B5] hover:text-[#F1F5F9]"
                   : "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
               }`}
             >

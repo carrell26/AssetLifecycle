@@ -12,7 +12,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(255))
     role = db.Column(db.String(20), nullable=False)  # 'admin' / 'karyawan_tif' / 'teknisi'
-    is_pj = db.Column(db.Boolean, default=False)
     district = db.Column(db.String(100))
     status = db.Column(db.String(20), default="aktif")  # 'aktif' / 'pending'
     avatar_path = db.Column(db.String(255), nullable=True)  # path relatif ke static/avatars/
@@ -34,3 +33,8 @@ class User(db.Model, UserMixin):
         if self.avatar_path:
             return f"/static/avatars/{self.avatar_path}"
         return None
+
+    @property
+    def avatar_url(self):
+        """Property avatar_url agar kompatibel diakses langsung di template Jinja."""
+        return self.get_avatar_url()

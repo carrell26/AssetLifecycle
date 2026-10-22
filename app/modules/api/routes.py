@@ -21,8 +21,10 @@ from ...models import (
     ModuleMovement,
     AuditLog,
     SlotDefinition,
+    DataImport,
 )
 from ...utils.hashing import append_audit_log
+from ...utils.module_classification import is_transceiver, get_asset_category
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -43,8 +45,7 @@ def get_current_user_profile():
             "name": current_user.name,
             "email": current_user.email,
             "role": current_user.role,
-            "is_pj": getattr(current_user, "is_pj", False),
-            "district": current_user.district or "Witel Donggala / Palu",
+            "district": current_user.district,
             "status": current_user.status,
             "avatar_url": current_user.get_avatar_url(),
         }
@@ -54,6 +55,9 @@ def get_current_user_profile():
 @api_bp.route("/me/avatar", methods=["POST"])
 @login_required
 def upload_avatar():
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     upload_dir = os.path.join(current_app.root_path, "static", "avatars")
     os.makedirs(upload_dir, exist_ok=True)
 
@@ -121,14 +125,31 @@ def get_dashboard_stats():
     # ============================================================
     total_locations = Location.query.count()
     total_devices = Device.query.count()
-    total_modules = Module.query.count()
 
-    modul_terpasang_result = db.session.query(
-        func.count(func.distinct(ModulePosition.module_id))
-    ).filter(
-        ModulePosition.status == "aktif"
-    ).scalar()
-    modul_terpasang = modul_terpasang_result or 0
+    # Hitung pemisahan Card Utama vs Transceiver SFP secara dinamis dari posisi aktif
+    all_active_positions = (
+        db.session.query(
+            ModulePosition.position_id,
+            ModulePosition.module_id,
+            ModulePosition.port,
+            ModuleType.nama_tipe.label("unit_type"),
+        )
+        .join(Module, ModulePosition.module_id == Module.modul_id)
+        .join(ModuleType, Module.module_type_id == ModuleType.module_type_id)
+        .filter(ModulePosition.status == "aktif")
+        .all()
+    )
+
+    card_positions = [p for p in all_active_positions if not is_transceiver(p.unit_type, p.port)]
+    sfp_positions = [p for p in all_active_positions if is_transceiver(p.unit_type, p.port)]
+
+    unique_active_cards = len(set(p.module_id for p in card_positions))
+    unique_active_sfps = len(set(p.module_id for p in sfp_positions))
+    total_active_assets = len(set(p.module_id for p in all_active_positions))
+
+    # KPI Utama Modul: Menghitung Card Utama Fisik secara terpisah dari transceiver
+    total_modules = unique_active_cards
+    modul_terpasang = unique_active_cards
 
     pending_approval = ModuleRequest.query.filter_by(
         status="PENDING"
@@ -389,6 +410,11 @@ def get_dashboard_stats():
             "total_devices": total_devices,
             "total_modules": total_modules,
             "modul_terpasang": modul_terpasang,
+            "total_cards": unique_active_cards,
+            "total_transceivers": unique_active_sfps,
+            "total_transceiver_positions": len(sfp_positions),
+            "total_assets": total_active_assets,
+            "total_positions": len(all_active_positions),
             "pending_approval": pending_approval,
             "capacity_percentage": round((modul_terpasang / total_modules * 100), 1) if total_modules > 0 else 0,
             "active_percentage": round((modul_terpasang / total_modules * 100), 1) if total_modules > 0 else 0,
@@ -417,6 +443,7 @@ def logout():
 def get_modules():
     ne_filter = request.args.get("ne", "").strip()
     search_query = request.args.get("q", "").strip()
+    category_filter = request.args.get("category", "all").strip().lower()
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 15, type=int)
 
@@ -447,13 +474,25 @@ def get_modules():
 
     # Filter scope perangkat
     if ne_filter and ne_filter != "all":
-        filtered_query = base_query.filter(Device.hostname == ne_filter)
+        scope_query = base_query.filter(Device.hostname == ne_filter)
         scope_info = f"Perangkat: {ne_filter}"
+        dev_obj = Device.query.filter_by(hostname=ne_filter).first()
+        total_devices_stat = 1 if dev_obj else 0
+        total_locations_stat = 1 if (dev_obj and dev_obj.location_id) else 0
     else:
         # Default fokus inventaris Palu: WN-24X-SUL-PAL11 & WN-24X-SUL-PAL211
-        filtered_query = base_query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"]))
+        scope_query = base_query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"]))
         scope_info = "Fokus inventaris STO PALU 1 & STO PALU 2"
+        total_devices_stat = Device.query.join(Location, Device.location_id == Location.location_id).filter(Location.nama_lokasi.ilike("STO Palu%")).count()
+        total_locations_stat = Location.query.filter(Location.nama_lokasi.ilike("STO Palu%")).count()
 
+    scope_all_rows = scope_query.all()
+    total_cards_stat = len(set(r.modul_id for r in scope_all_rows if not is_transceiver(r.unit_type, r.port)))
+    total_transceivers_stat = len(set(r.modul_id for r in scope_all_rows if is_transceiver(r.unit_type, r.port)))
+    total_assets_stat = len(set(r.modul_id for r in scope_all_rows))
+    total_positions_stat = len(scope_all_rows)
+
+    filtered_query = scope_query
     if search_query:
         search_term = f"%{search_query}%"
         filtered_query = filtered_query.filter(
@@ -466,31 +505,23 @@ def get_modules():
             | (ModulePosition.port.ilike(search_term))
         )
 
-    total_count = filtered_query.count()
-
-    # Hitung KPI statistik dari query aktual
-    if ne_filter and ne_filter != "all":
-        dev_obj = Device.query.filter_by(hostname=ne_filter).first()
-        total_modules_stat = base_query.filter(Device.hostname == ne_filter).count()
-        total_devices_stat = 1 if dev_obj else 0
-        total_locations_stat = 1 if (dev_obj and dev_obj.location_id) else 0
-    else:
-        # Scope Palu PSS
-        total_modules_stat = base_query.filter(Device.hostname.in_(["WN-24X-SUL-PAL11", "WN-24X-SUL-PAL211"])).count()
-        total_devices_stat = Device.query.join(Location, Device.location_id == Location.location_id).filter(Location.nama_lokasi.ilike("STO Palu%")).count()
-        total_locations_stat = Location.query.filter(Location.nama_lokasi.ilike("STO Palu%")).count()
-
-    # Pagination
-    items_raw = (
+    all_matching_rows = (
         filtered_query.order_by(
             Device.hostname.asc(),
             SlotDefinition.nomor_slot.asc(),
             ModulePosition.port.asc(),
-        )
-        .offset((page - 1) * per_page)
-        .limit(per_page)
-        .all()
+        ).all()
     )
+
+    if category_filter == "card":
+        display_rows = [r for r in all_matching_rows if not is_transceiver(r.unit_type, r.port)]
+    elif category_filter in ("transceiver", "sfp"):
+        display_rows = [r for r in all_matching_rows if is_transceiver(r.unit_type, r.port)]
+    else:
+        display_rows = all_matching_rows
+
+    total_count = len(display_rows)
+    items_raw = display_rows[(page - 1) * per_page : page * per_page]
 
     items = []
     for row in items_raw:
@@ -501,6 +532,7 @@ def get_modules():
             "device_id": row.device_id,
             "ne_name": row.ne_name,
             "unit_type": row.unit_type,
+            "asset_category": get_asset_category(row.unit_type, row.port),
             "location_name": row.location_name,
             "port": row.port if row.port else "-",
             "shelf": row.shelf if row.shelf else "-",
@@ -522,8 +554,13 @@ def get_modules():
         "per_page": per_page,
         "total_pages": total_pages,
         "scope_info": scope_info,
+        "category_filter": category_filter,
         "stats": {
-            "total_modules": total_modules_stat,
+            "total_modules": total_cards_stat,
+            "total_cards": total_cards_stat,
+            "total_transceivers": total_transceivers_stat,
+            "total_assets": total_assets_stat,
+            "total_positions": total_positions_stat,
             "total_devices": total_devices_stat,
             "total_locations": total_locations_stat,
         }
@@ -614,6 +651,7 @@ def get_module_detail(modul_id):
             "serial_number": module.serial_number,
             "unit_part_number": module.unit_part_number or "-",
             "unit_type": module.module_type.nama_tipe if module.module_type else "-",
+            "asset_category": get_asset_category(module.module_type.nama_tipe if module.module_type else "", position.port if position else None),
             "module_type_id": module.module_type_id,
             "kondisi": module.kondisi,
             "original_date": module.original_date or "-",
@@ -640,6 +678,9 @@ def get_module_detail(modul_id):
 @api_bp.route("/modules", methods=["POST"])
 @login_required
 def create_module():
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     data = request.get_json() or {}
     device_id = data.get("device_id")
     module_type_id = data.get("module_type_id")
@@ -766,6 +807,9 @@ def create_module():
 @api_bp.route("/modules/<int:modul_id>", methods=["PUT"])
 @login_required
 def update_module(modul_id):
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     module = Module.query.get_or_404(modul_id)
     data = request.get_json() or {}
 
@@ -865,6 +909,9 @@ def update_module(modul_id):
 @api_bp.route("/modules/<int:modul_id>", methods=["DELETE"])
 @login_required
 def delete_module(modul_id):
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     module = Module.query.get_or_404(modul_id)
 
     has_movement = ModuleMovement.query.filter_by(module_id=modul_id).first()
@@ -1025,6 +1072,9 @@ def get_location_detail(location_id):
 @api_bp.route("/locations", methods=["POST"])
 @login_required
 def create_location():
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     data = request.get_json() or {}
     nama_lokasi = (data.get("nama_lokasi") or "").strip()
     district = (data.get("district") or "").strip()
@@ -1100,6 +1150,9 @@ def create_location():
 @api_bp.route("/locations/<int:location_id>", methods=["PUT"])
 @login_required
 def update_location(location_id):
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     loc = Location.query.get_or_404(location_id)
     data = request.get_json() or {}
 
@@ -1170,6 +1223,9 @@ def update_location(location_id):
 @api_bp.route("/locations/<int:location_id>", methods=["DELETE"])
 @login_required
 def delete_location(location_id):
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({"success": False, "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data."}), 403
+
     loc = Location.query.get_or_404(location_id)
 
     # Cek relasi perangkat di database nyata
@@ -1290,7 +1346,14 @@ def get_devices():
 
     items = []
     for d in devices_list:
-        installed_count = ModulePosition.query.filter_by(device_id=d.device_id, status="aktif").count()
+        positions_for_dev = ModulePosition.query.filter_by(device_id=d.device_id, status="aktif").all()
+        installed_count = len([
+            p for p in positions_for_dev
+            if not is_transceiver(
+                p.module.module_type.nama_tipe if p.module and p.module.module_type else "",
+                p.port
+            )
+        ])
         items.append({
             "id": d.device_id,
             "device_id": d.device_id,
@@ -1338,8 +1401,16 @@ def get_device_detail(device_id):
         .all()
     )
 
+    card_positions = [
+        p for p in positions
+        if not is_transceiver(
+            p.module.module_type.nama_tipe if p.module and p.module.module_type else "",
+            p.port
+        )
+    ]
+
     installed_modules = []
-    for p in positions:
+    for p in card_positions:
         mod = p.module
         slot_def = p.slot_definition
         installed_modules.append({
@@ -1545,6 +1616,321 @@ def delete_device(device_id):
     return jsonify({
         "success": True,
         "message": f"Perangkat '{dev_name}' berhasil dihapus dari sistem."
+    })
+
+
+# =====================================================================
+# ADMIN USER MANAGEMENT (KELOLA USER) APIS
+# =====================================================================
+
+@api_bp.route("/admin/users", methods=["GET"])
+@login_required
+def list_admin_users():
+    """Mengambil daftar seluruh akun pengguna sistem (Admin only)."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    users = User.query.order_by(User.created_at.desc()).all()
+    user_list = [
+        {
+            "user_id": u.user_id,
+            "name": u.name,
+            "email": u.email,
+            "role": u.role,
+            "district": u.district or "-",
+            "status": u.status or "aktif",
+            "avatar_url": u.get_avatar_url(),
+            "created_at": u.created_at.strftime("%Y-%m-%d %H:%M") if u.created_at else None,
+            "updated_at": u.updated_at.strftime("%Y-%m-%d %H:%M") if u.updated_at else None,
+        }
+        for u in users
+    ]
+
+    return jsonify({"success": True, "users": user_list, "total": len(user_list)})
+
+
+@api_bp.route("/admin/users/<int:user_id>", methods=["GET"])
+@login_required
+def get_admin_user_detail(user_id):
+    """Mengambil detail satu pengguna (Admin only). Password tidak pernah ditampilkan."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    u = User.query.get_or_404(user_id)
+    return jsonify({
+        "success": True,
+        "user": {
+            "user_id": u.user_id,
+            "name": u.name,
+            "email": u.email,
+            "role": u.role,
+            "district": u.district or "-",
+            "status": u.status or "aktif",
+            "avatar_url": u.get_avatar_url(),
+            "created_at": u.created_at.strftime("%Y-%m-%d %H:%M") if u.created_at else None,
+            "updated_at": u.updated_at.strftime("%Y-%m-%d %H:%M") if u.updated_at else None,
+        }
+    })
+
+
+@api_bp.route("/admin/users", methods=["POST"])
+@login_required
+def create_admin_user():
+    """Admin membuat akun baru (Karyawan TIF atau Teknisi). Password di-hash dengan aman."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    data = request.get_json(silent=True) or request.form
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    role = (data.get("role") or "").strip()
+    district = (data.get("district") or "").strip()
+    password = data.get("password") or ""
+
+    if not name or not email or not role or not district or not password:
+        return jsonify({"success": False, "error": "Semua kolom wajib diisi (Nama, Email, Role, District, Password)."}), 400
+
+    if role not in ["karyawan_tif", "teknisi", "admin"]:
+        return jsonify({"success": False, "error": "Role tidak valid. Pilihan yang didukung: Karyawan TIF atau Teknisi."}), 400
+
+    if len(password) < 8:
+        return jsonify({"success": False, "error": "Password awal minimal harus 8 karakter."}), 400
+
+    # Cek duplikasi email
+    if User.query.filter_by(email=email).first():
+        return jsonify({"success": False, "error": f"Email '{email}' sudah terdaftar pada akun lain."}), 400
+
+    new_user = User(
+        name=name,
+        email=email,
+        role=role,
+        district=district,
+        status="aktif",
+    )
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    append_audit_log(
+        db,
+        user_id=current_user.user_id,
+        aksi="CREATE_USER",
+        table_name="user",
+        record_id=new_user.user_id,
+        data_dict={
+            "name": new_user.name,
+            "email": new_user.email,
+            "role": new_user.role,
+            "district": new_user.district,
+            "status": new_user.status,
+            "created_by": current_user.name,
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": f"Akun pengguna '{name}' ({role}) berhasil dibuat dan langsung berstatus aktif.",
+        "user": {
+            "user_id": new_user.user_id,
+            "name": new_user.name,
+            "email": new_user.email,
+            "role": new_user.role,
+            "district": new_user.district,
+            "status": new_user.status,
+            "created_at": new_user.created_at.strftime("%Y-%m-%d %H:%M") if new_user.created_at else None,
+        }
+    }), 201
+
+
+@api_bp.route("/admin/users/<int:user_id>", methods=["PUT"])
+@login_required
+def update_admin_user(user_id):
+    """Admin memperbarui informasi akun pengguna (Nama, Email, Role, District, Status)."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    u = User.query.get_or_404(user_id)
+    data = request.get_json(silent=True) or request.form
+
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    role = (data.get("role") or "").strip()
+    district = (data.get("district") or "").strip()
+    status = (data.get("status") or "").strip()
+
+    if not name or not email or not role or not district:
+        return jsonify({"success": False, "error": "Nama, Email, Role, dan District wajib diisi."}), 400
+
+    if role not in ["admin", "karyawan_tif", "teknisi"]:
+        return jsonify({"success": False, "error": "Role tidak valid."}), 400
+
+    if status and status not in ["aktif", "pending", "nonaktif"]:
+        return jsonify({"success": False, "error": "Status tidak valid. Pilihan: aktif, pending, nonaktif."}), 400
+
+    # Proteksi akun diri sendiri: admin tidak boleh mendowngrade role sendiri atau menonaktifkan diri
+    if u.user_id == current_user.user_id:
+        if role != "admin":
+            return jsonify({"success": False, "error": "Anda tidak dapat mengubah role akun Admin yang sedang Anda gunakan."}), 400
+        if status and status != "aktif":
+            return jsonify({"success": False, "error": "Anda tidak dapat menonaktifkan akun yang sedang Anda gunakan."}), 400
+
+    # Cek keunikan email
+    existing = User.query.filter(User.email == email, User.user_id != user_id).first()
+    if existing:
+        return jsonify({"success": False, "error": f"Email '{email}' sudah digunakan oleh pengguna lain."}), 400
+
+    u.name = name
+    u.email = email
+    u.role = role
+    u.district = district
+    if status:
+        u.status = status
+
+    db.session.commit()
+
+    append_audit_log(
+        db,
+        user_id=current_user.user_id,
+        aksi="UPDATE_USER",
+        table_name="user",
+        record_id=u.user_id,
+        data_dict={
+            "name": u.name,
+            "email": u.email,
+            "role": u.role,
+            "district": u.district,
+            "status": u.status,
+            "updated_by": current_user.name,
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": f"Data pengguna '{u.name}' berhasil diperbarui.",
+        "user": {
+            "user_id": u.user_id,
+            "name": u.name,
+            "email": u.email,
+            "role": u.role,
+            "district": u.district,
+            "status": u.status,
+        }
+    })
+
+
+@api_bp.route("/admin/users/<int:user_id>/reset-password", methods=["POST"])
+@login_required
+def reset_admin_user_password(user_id):
+    """Admin mereset password akun pengguna. Password baru di-hash dan password lama tidak pernah diekspos."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    u = User.query.get_or_404(user_id)
+    data = request.get_json(silent=True) or request.form
+
+    new_password = (data.get("new_password") or data.get("password") or "").strip()
+    if not new_password or len(new_password) < 8:
+        return jsonify({"success": False, "error": "Password baru wajib diisi dan minimal 8 karakter."}), 400
+
+    u.set_password(new_password)
+    db.session.commit()
+
+    append_audit_log(
+        db,
+        user_id=current_user.user_id,
+        aksi="RESET_PASSWORD_USER",
+        table_name="user",
+        record_id=u.user_id,
+        data_dict={
+            "target_user_name": u.name,
+            "target_user_email": u.email,
+            "reset_by": current_user.name,
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": f"Password untuk akun '{u.name}' ({u.email}) berhasil direset."
+    })
+
+
+@api_bp.route("/admin/users/<int:user_id>/approve", methods=["POST"])
+@login_required
+def api_approve_user(user_id):
+    """Admin mengaktifkan akun pengguna yang berstatus pending."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    u = User.query.get_or_404(user_id)
+    u.status = "aktif"
+    db.session.commit()
+
+    append_audit_log(
+        db,
+        user_id=current_user.user_id,
+        aksi="APPROVE_USER",
+        table_name="user",
+        record_id=u.user_id,
+        data_dict={
+            "target_user_name": u.name,
+            "target_user_email": u.email,
+            "approved_by": current_user.name,
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": f"Akun pengguna '{u.name}' telah disetujui dan berstatus aktif."
+    })
+
+
+@api_bp.route("/admin/users/<int:user_id>", methods=["DELETE"])
+@login_required
+def delete_admin_user(user_id):
+    """Admin menghapus akun pengguna dengan validasi integritas database & relasi audit."""
+    if current_user.role != "admin":
+        return jsonify({"success": False, "error": "Akses ditolak. Fitur ini hanya dapat diakses oleh Admin."}), 403
+
+    u = User.query.get_or_404(user_id)
+
+    # 1. Tidak boleh menghapus akun sendiri
+    if u.user_id == current_user.user_id:
+        return jsonify({"success": False, "error": "Tidak dapat menghapus akun Anda sendiri yang sedang aktif digunakan."}), 400
+
+    # 2. Periksa relasi riwayat aktivitas & mutasi demi integritas data database
+    has_audit = AuditLog.query.filter_by(user_id=user_id).first() is not None
+    has_movement = ModuleMovement.query.filter_by(user_id=user_id).first() is not None
+    has_request = ModuleRequest.query.filter_by(requested_by=user_id).first() is not None
+    has_import = DataImport.query.filter_by(user_id=user_id).first() is not None
+
+    if has_audit or has_movement or has_request or has_import:
+        return jsonify({
+            "success": False,
+            "error": f"Pengguna '{u.name}' memiliki riwayat aktivitas, audit log, atau mutasi modul dalam sistem dan tidak dapat dihapus secara permanen demi integritas data historis. Silakan ubah status pengguna menjadi 'nonaktif' melalui tombol Edit."
+        }), 400
+
+    user_name = u.name
+    user_email = u.email
+
+    db.session.delete(u)
+    db.session.commit()
+
+    append_audit_log(
+        db,
+        user_id=current_user.user_id,
+        aksi="DELETE_USER",
+        table_name="user",
+        record_id=user_id,
+        data_dict={
+            "deleted_user_name": user_name,
+            "deleted_user_email": user_email,
+            "deleted_by": current_user.name,
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": f"Pengguna '{user_name}' berhasil dihapus dari sistem."
     })
 
 
