@@ -24,7 +24,12 @@ from ...models import (
     DataImport,
 )
 from ...utils.hashing import append_audit_log
-from ...utils.module_classification import is_transceiver, get_asset_category
+from ...utils.module_classification import (
+    is_transceiver,
+    get_asset_category,
+    has_valid_port,
+    matches_transceiver_type,
+)
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -153,6 +158,12 @@ def get_dashboard_stats():
 
     pending_approval = ModuleRequest.query.filter_by(
         status="PENDING"
+    ).count()
+
+    # Hitung total mutasi modul 30 hari terakhir dari ModuleMovement
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    total_mutasi_30d = ModuleMovement.query.filter(
+        ModuleMovement.tanggal >= thirty_days_ago
     ).count()
 
     # ============================================================
@@ -416,6 +427,7 @@ def get_dashboard_stats():
             "total_assets": total_active_assets,
             "total_positions": len(all_active_positions),
             "pending_approval": pending_approval,
+            "total_mutasi": total_mutasi_30d,
             "capacity_percentage": round((modul_terpasang / total_modules * 100), 1) if total_modules > 0 else 0,
             "active_percentage": round((modul_terpasang / total_modules * 100), 1) if total_modules > 0 else 0,
         },
@@ -944,6 +956,375 @@ def delete_module(modul_id):
     db.session.commit()
 
     return jsonify({"success": True, "message": f"Modul '{sn}' berhasil dihapus dari sistem."})
+
+
+# ============================================================
+# MUTASI MODUL LANGSUNG & RIWAYAT PERPINDAHAN API
+# ============================================================
+
+@api_bp.route("/module-movements", methods=["GET"])
+@login_required
+def get_module_movements():
+    """
+    Mengambil data riwayat mutasi modul langsung (append-only ledger).
+    Dapat diakses oleh seluruh pengguna authenticated (termasuk teknisi sebagai read-only).
+    """
+    search_q = (request.args.get("q") or "").strip()
+    jenis_filter = (request.args.get("jenis") or "").strip().lower()
+    device_id_filter = request.args.get("device_id", type=int)
+
+    query = ModuleMovement.query
+
+    if jenis_filter and jenis_filter != "all":
+        query = query.filter(func.lower(ModuleMovement.jenis_perubahan) == jenis_filter)
+
+    if device_id_filter:
+        query = query.filter(
+            (ModuleMovement.from_device_id == device_id_filter)
+            | (ModuleMovement.to_device_id == device_id_filter)
+        )
+
+    all_movements = query.order_by(
+        ModuleMovement.tanggal.desc(),
+        ModuleMovement.movement_id.desc()
+    ).all()
+
+    items = []
+    for m in all_movements:
+        mod = m.module
+        sn = mod.serial_number if mod else f"#{m.module_id}"
+        unit_type = mod.module_type.nama_tipe if mod and mod.module_type else "-"
+        part_number = mod.unit_part_number if mod and mod.unit_part_number else "-"
+
+        # Dari perangkat & slot
+        from_dev_name = m.from_device.nama_perangkat if m.from_device else "-"
+        from_hostname = m.from_device.hostname if m.from_device else "-"
+        from_loc_name = m.from_device.location.nama_lokasi if m.from_device and m.from_device.location else "-"
+        from_slot = m.from_slot_definition.nomor_slot if m.from_slot_definition else "-"
+
+        # Ambil shelf & port historis asal jika ada
+        from_shelf = "-"
+        from_port = "-"
+        if m.from_device_id and m.from_slot_definition_id:
+            pos_from = ModulePosition.query.filter_by(
+                module_id=m.module_id,
+                device_id=m.from_device_id,
+                slot_definition_id=m.from_slot_definition_id,
+            ).first()
+            if pos_from:
+                from_shelf = pos_from.shelf or "1"
+                from_port = pos_from.port or "-"
+
+        # Ke perangkat & slot
+        to_dev_name = m.to_device.nama_perangkat if m.to_device else "-"
+        to_hostname = m.to_device.hostname if m.to_device else "-"
+        to_loc_name = m.to_device.location.nama_lokasi if m.to_device and m.to_device.location else "-"
+        to_slot = m.to_slot_definition.nomor_slot if m.to_slot_definition else "-"
+
+        to_shelf = "-"
+        to_port = "-"
+        if m.to_device_id and m.to_slot_definition_id:
+            pos_to = ModulePosition.query.filter_by(
+                module_id=m.module_id,
+                device_id=m.to_device_id,
+                slot_definition_id=m.to_slot_definition_id,
+            ).first()
+            if pos_to:
+                to_shelf = pos_to.shelf or "1"
+                to_port = pos_to.port or "-"
+
+        actor_name = m.actor.name if m.actor else (db.session.get(User, m.user_id).name if m.user_id else "-")
+        waktu_str = m.tanggal.strftime("%d %b %Y %H:%M") if m.tanggal else "-"
+
+        # Search filter in-memory if needed
+        if search_q:
+            q_lower = search_q.lower()
+            match = (
+                q_lower in sn.lower()
+                or q_lower in unit_type.lower()
+                or q_lower in part_number.lower()
+                or q_lower in from_dev_name.lower()
+                or q_lower in to_dev_name.lower()
+                or q_lower in from_loc_name.lower()
+                or q_lower in to_loc_name.lower()
+                or q_lower in actor_name.lower()
+                or q_lower in (m.keterangan or "").lower()
+            )
+            if not match:
+                continue
+
+        items.append({
+            "movement_id": m.movement_id,
+            "module_id": m.module_id,
+            "serial_number": sn,
+            "unit_type": unit_type,
+            "unit_part_number": part_number,
+            "jenis_perubahan": m.jenis_perubahan or "pindah",
+            "tanggal": waktu_str,
+            "tanggal_iso": m.tanggal.isoformat() if m.tanggal else None,
+            "keterangan": m.keterangan or "-",
+            "user_id": m.user_id,
+            "actor_name": actor_name,
+            "from_device_id": m.from_device_id,
+            "from_device_name": from_dev_name,
+            "from_hostname": from_hostname,
+            "from_location_name": from_loc_name,
+            "from_slot": from_slot,
+            "from_shelf": from_shelf,
+            "from_port": from_port,
+            "to_device_id": m.to_device_id,
+            "to_device_name": to_dev_name,
+            "to_hostname": to_hostname,
+            "to_location_name": to_loc_name,
+            "to_slot": to_slot,
+            "to_shelf": to_shelf,
+            "to_port": to_port,
+        })
+
+    total_count = len(all_movements)
+    now = datetime.utcnow()
+    month_start = datetime(now.year, now.month, 1)
+    this_month_count = sum(1 for m in all_movements if m.tanggal and m.tanggal >= month_start)
+    unique_mods = len(set(m.module_id for m in all_movements if m.module_id))
+
+    return jsonify({
+        "success": True,
+        "total": total_count,
+        "filtered_total": len(items),
+        "this_month_count": this_month_count,
+        "unique_modules_moved": unique_mods,
+        "items": items,
+    })
+
+
+@api_bp.route("/modules/move", methods=["POST"])
+@login_required
+def move_module_direct():
+    """
+    Mutasi Modul Langsung (Direct Mutation) tanpa proses approval/pengajuan.
+    Hanya diizinkan untuk role 'admin' (Super Admin) dan 'karyawan_tif'.
+    Teknisi ditolak dengan HTTP 403 Forbidden.
+    """
+    if current_user.role not in ["admin", "karyawan_tif"]:
+        return jsonify({
+            "success": False,
+            "error": "Akses ditolak. Teknisi hanya memiliki akses melihat data (read-only)."
+        }), 403
+
+    data = request.get_json() or {}
+
+    module_id = data.get("module_id")
+    to_device_id = data.get("to_device_id")
+    to_slot_raw = str(data.get("to_slot") or "").strip()
+    to_shelf_raw = str(data.get("to_shelf") or "1").strip()
+    to_port_raw = str(data.get("to_port") or "").strip()
+    date_raw = str(data.get("date") or "").strip()
+    keterangan = str(data.get("keterangan") or "").strip()
+
+    if not module_id:
+        return jsonify({"success": False, "error": "Modul wajib dipilih."}), 400
+    if not to_device_id:
+        return jsonify({"success": False, "error": "Perangkat tujuan wajib dipilih."}), 400
+    if not to_slot_raw:
+        return jsonify({"success": False, "error": "Nomor Slot tujuan wajib diisi."}), 400
+
+    try:
+        module = Module.query.get(module_id)
+        if not module:
+            return jsonify({"success": False, "error": "Modul tidak ditemukan."}), 404
+
+        target_device = Device.query.get(to_device_id)
+        if not target_device:
+            return jsonify({"success": False, "error": "Perangkat tujuan tidak ditemukan."}), 404
+
+        # Resolusi Slot Definition untuk perangkat tujuan
+        slot_def = SlotDefinition.query.filter_by(
+            device_type_id=target_device.device_type_id,
+            nomor_slot=to_slot_raw
+        ).first()
+        if not slot_def:
+            slot_def = SlotDefinition(
+                device_type_id=target_device.device_type_id,
+                nomor_slot=to_slot_raw
+            )
+            db.session.add(slot_def)
+            db.session.flush()
+
+        # Klasifikasi modul: CARD vs TRANSCEIVER (Dual-Factor)
+        target_unit_type = (module.module_type.nama_tipe if module.module_type else "").strip()
+        target_is_transceiver_type = matches_transceiver_type(target_unit_type)
+
+        shelf_norm = to_shelf_raw or "1"
+        port_norm = to_port_raw
+
+        if target_is_transceiver_type:
+            if not has_valid_port(port_norm):
+                return jsonify({
+                    "success": False,
+                    "error": f"Modul dengan tipe '{target_unit_type}' adalah Transceiver optik dan wajib memiliki nomor Port yang valid."
+                }), 400
+        else:
+            # Modul CARD: kosongkan port jika user mengisinya "-"
+            if not port_norm or port_norm == "-":
+                port_norm = ""
+
+        target_is_trans = is_transceiver(target_unit_type, port_norm)
+
+        # Validasi konflik posisi pada perangkat, slot, shelf, dan port tujuan
+        other_positions = ModulePosition.query.filter(
+            ModulePosition.device_id == target_device.device_id,
+            ModulePosition.slot_definition_id == slot_def.slot_definition_id,
+            ModulePosition.status == "aktif",
+            ModulePosition.module_id != module.modul_id,
+        ).all()
+
+        target_port_lower = port_norm.lower()
+
+        for other_p in other_positions:
+            other_shelf_norm = (str(other_p.shelf or "1")).strip()
+            if other_shelf_norm != shelf_norm:
+                continue
+
+            other_m = other_p.module
+            other_type_name = other_m.module_type.nama_tipe if other_m and other_m.module_type else ""
+            other_is_trans = is_transceiver(other_type_name, other_p.port)
+            other_port_norm = (str(other_p.port or "")).strip().lower()
+
+            if target_is_trans and other_is_trans:
+                # Dua Transceiver di slot & shelf yang sama: konflik HANYA jika port sama
+                if target_port_lower == other_port_norm:
+                    return jsonify({
+                        "success": False,
+                        "error": f"Port {port_norm} pada Slot {to_slot_raw} ({target_device.hostname}) sudah ditempati transceiver lain ({other_m.serial_number if other_m else 'lain'})."
+                    }), 400
+            elif not target_is_trans and not other_is_trans:
+                # Dua CARD di slot & shelf yang sama: konflik!
+                return jsonify({
+                    "success": False,
+                    "error": f"Slot {to_slot_raw} pada {target_device.hostname} sudah ditempati Card aktif lain ({other_m.serial_number if other_m else 'lain'})."
+                }), 400
+            else:
+                # Card dan Transceiver berdampingan: diperbolehkan selama port tidak bentrok
+                if target_port_lower and other_port_norm and (target_port_lower == other_port_norm):
+                    return jsonify({
+                        "success": False,
+                        "error": f"Port {port_norm} pada Slot {to_slot_raw} ({target_device.hostname}) sudah digunakan modul lain."
+                    }), 400
+
+        # Ambil posisi aktif saat ini
+        current_pos = ModulePosition.query.filter_by(
+            module_id=module.modul_id,
+            status="aktif"
+        ).first()
+
+        # Validasi apakah modul sudah di posisi tujuan yang sama persis
+        if current_pos:
+            curr_shelf = (str(current_pos.shelf or "1")).strip()
+            curr_port = (str(current_pos.port or "")).strip().lower()
+            if (
+                current_pos.device_id == target_device.device_id
+                and current_pos.slot_definition_id == slot_def.slot_definition_id
+                and curr_shelf == shelf_norm
+                and curr_port == target_port_lower
+            ):
+                return jsonify({
+                    "success": False,
+                    "error": f"Modul {module.serial_number} sudah berada pada posisi tersebut."
+                }), 400
+
+        # Parsing tanggal mutasi jika disediakan
+        d_parsed = None
+        if date_raw and date_raw != "-":
+            if "-" in date_raw:
+                try:
+                    d_parsed = datetime.strptime(date_raw, "%Y-%m-%d")
+                except Exception:
+                    d_parsed = None
+            elif "/" in date_raw:
+                try:
+                    d_parsed = datetime.strptime(date_raw, "%d/%m/%Y")
+                except Exception:
+                    d_parsed = None
+
+        mutation_time = d_parsed or datetime.utcnow()
+
+        # Posisi asal untuk pencatatan riwayat
+        old_dev_id = current_pos.device_id if current_pos else None
+        old_slot_def_id = current_pos.slot_definition_id if current_pos else None
+
+        # 1. Nonaktifkan posisi lama secara atomik
+        if current_pos:
+            current_pos.status = "dilepas"
+
+        # 2. Buat posisi aktif baru
+        new_pos = ModulePosition(
+            module_id=module.modul_id,
+            device_id=target_device.device_id,
+            slot_definition_id=slot_def.slot_definition_id,
+            shelf=shelf_norm or "1",
+            port=port_norm,
+            status="aktif",
+            installed_at=mutation_time,
+        )
+        db.session.add(new_pos)
+
+        # 3. Buat catatan riwayat ModuleMovement
+        action_type = "pindah" if current_pos else "pasang"
+        keterangan_final = keterangan or f"Mutasi modul ke {target_device.hostname} Slot {to_slot_raw} oleh {current_user.name}"
+
+        movement = ModuleMovement(
+            module_id=module.modul_id,
+            user_id=current_user.user_id,
+            from_device_id=old_dev_id,
+            from_slot_definition_id=old_slot_def_id,
+            to_device_id=target_device.device_id,
+            to_slot_definition_id=slot_def.slot_definition_id,
+            jenis_perubahan=action_type,
+            tanggal=mutation_time,
+            keterangan=keterangan_final,
+        )
+        db.session.add(movement)
+        db.session.flush()
+
+        # 4. Catat AuditLog (aksi: MODULE_MUTATION) terhubung ke hash chain
+        append_audit_log(
+            db,
+            user_id=current_user.user_id,
+            aksi="MODULE_MUTATION",
+            table_name="module_movements",
+            record_id=movement.movement_id,
+            data_dict={
+                "module_id": module.modul_id,
+                "serial_number": module.serial_number,
+                "unit_type": target_unit_type,
+                "from_device_id": old_dev_id,
+                "from_slot_definition_id": old_slot_def_id,
+                "to_device_id": target_device.device_id,
+                "to_slot_definition_id": slot_def.slot_definition_id,
+                "shelf": shelf_norm,
+                "port": port_norm,
+                "jenis_perubahan": action_type,
+                "actor": current_user.name,
+                "keterangan": keterangan_final,
+            }
+        )
+
+        # 5. Commit transaksi atomik
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": f"Modul {module.serial_number} berhasil dipindahkan ke {target_device.hostname} Slot {to_slot_raw}.",
+            "movement_id": movement.movement_id,
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error executing module move: {e}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": f"Terjadi kesalahan internal saat mencatat mutasi modul: {str(e)}"
+        }), 500
 
 
 # ============================================================

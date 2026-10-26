@@ -8,13 +8,12 @@ import DeviceDistributionChart from "./components/DeviceDistributionChart";
 import ModuleConditionChart from "./components/ModuleConditionChart";
 import MovementTrendChart from "./components/MovementTrendChart";
 import RecentActivities from "./components/RecentActivities";
-import TeknisiKpiCards from "./components/TeknisiKpiCards";
-import TeknisiRecentRequests from "./components/TeknisiRecentRequests";
 import AvatarModal from "./components/AvatarModal";
 import LogoutModal from "./components/LogoutModal";
 import LoginPage from "./pages/LoginPage";
 import UsersPage from "./pages/UsersPage";
 import ModulesPage from "./pages/ModulesPage";
+import ModuleMovementsPage from "./pages/ModuleMovementsPage";
 import LocationsPage from "./pages/LocationsPage";
 import DevicesPage from "./pages/DevicesPage";
 import ImportPage from "./pages/ImportPage";
@@ -33,7 +32,8 @@ export default function App() {
   }
 
   const isUsersPage = path.startsWith("/auth/admin/users") || path.startsWith("/auth/admin/register-karyawan");
-  const isModulesPage = path.startsWith("/modules");
+  const isMutasiPage = path.startsWith("/modules/requests") || path.startsWith("/modules/movements") || path.startsWith("/modules/mutasi");
+  const isModulesPage = path.startsWith("/modules") && !isMutasiPage;
   const isLocationsPage = path.startsWith("/device/locations");
   const isDevicesPage = path.startsWith("/device/devices") || path === "/devices";
   const isImportPage = path.startsWith("/import");
@@ -86,10 +86,10 @@ export default function App() {
 
   useEffect(() => {
     fetchUser();
-    if (!isModulesPage && !isLocationsPage && !isDevicesPage && !isImportPage && !isExportPage && !isUsersPage) {
+    if (!isModulesPage && !isMutasiPage && !isLocationsPage && !isDevicesPage && !isImportPage && !isExportPage && !isUsersPage) {
       fetchStats("30d");
     }
-  }, [isModulesPage, isLocationsPage, isDevicesPage, isImportPage, isExportPage, isUsersPage]);
+  }, [isModulesPage, isMutasiPage, isLocationsPage, isDevicesPage, isImportPage, isExportPage, isUsersPage]);
 
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);
@@ -129,6 +129,15 @@ export default function App() {
             /* HALAMAN KELOLA USER (INTEGRASI DAFTARKAN KARYAWAN)        */
             /* ======================================================== */
             <UsersPage
+              user={user}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+          ) : isMutasiPage ? (
+            /* ======================================================== */
+            /* HALAMAN MUTASI MODUL (LANGSUNG & RIWAYAT AUDIT LEDGER)    */
+            /* ======================================================== */
+            <ModuleMovementsPage
               user={user}
               searchValue={searchValue}
               onSearchChange={setSearchValue}

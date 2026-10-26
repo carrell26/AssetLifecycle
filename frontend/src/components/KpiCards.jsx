@@ -7,7 +7,7 @@ export default function KpiCards({ kpi }) {
   const totalDevices = kpi?.total_devices ?? 0;
   const totalModules = kpi?.total_modules ?? 0;
   const modulTerpasang = kpi?.modul_terpasang ?? 0;
-  const pendingApproval = kpi?.pending_approval ?? 0;
+  const totalMutasi = kpi?.total_mutasi ?? (kpi?.pending_approval ?? 0);
   const activePercentage = kpi?.active_percentage ?? 100;
 
   return (
@@ -280,7 +280,7 @@ export default function KpiCards({ kpi }) {
         </div>
       </div>
 
-      {/* KPI 4: Pending Approval */}
+      {/* KPI 4: Total Mutasi (30 Hari Terakhir) */}
       <div
         className={`rounded-2xl p-4 border shadow-sm relative overflow-hidden flex flex-col justify-between group cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
           isDark
@@ -298,12 +298,12 @@ export default function KpiCards({ kpi }) {
                   isDark ? "text-[#94A3B8]" : "text-slate-500"
                 }`}
               >
-                Pending Approval
+                Total Mutasi
               </span>
             </div>
             <div className="text-2xl font-bold tracking-tight leading-none mt-1 flex items-baseline gap-1.5">
-              <span>{pendingApproval}</span>
-              <span className="text-[11px] font-normal text-amber-500">Tiket</span>
+              <span>{totalMutasi}</span>
+              <span className="text-[11px] font-normal text-amber-500">Aktivitas</span>
             </div>
           </div>
           <div
@@ -313,7 +313,7 @@ export default function KpiCards({ kpi }) {
                 : "bg-amber-50 border-amber-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-white"
             }`}
           >
-            <span className="material-symbols-outlined text-[23px]">pending_actions</span>
+            <span className="material-symbols-outlined text-[23px]">swap_horiz</span>
           </div>
         </div>
 
@@ -328,9 +328,9 @@ export default function KpiCards({ kpi }) {
                 isDark ? "text-[#94A3B8]" : "text-slate-500"
               }`}
             >
-              <span>Status Antrean</span>
+              <span>Periode Aktivitas</span>
               <span className="text-amber-500 font-semibold">
-                {pendingApproval > 0 ? "Butuh Tindakan" : "Semua Terproses"}
+                30 Hari Terakhir
               </span>
             </div>
             <div
@@ -342,21 +342,21 @@ export default function KpiCards({ kpi }) {
             >
               <div
                 className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500"
-                style={{ width: `${Math.min(pendingApproval * 20, 100)}%` }}
+                style={{ width: `${Math.min(totalMutasi * 10, 100)}%` }}
               ></div>
             </div>
           </div>
           <div className="flex items-center justify-between pt-0.5">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-[10px] text-amber-600 font-semibold">
-              <span className="material-symbols-outlined text-[13px]">schedule</span>
-              <span>Prioritas</span>
+              <span className="material-symbols-outlined text-[13px]">verified</span>
+              <span>Ledger Tercatat</span>
             </div>
             <span
               className={`text-[10px] font-mono ${
                 isDark ? "text-[#64748B]" : "text-slate-400"
               }`}
             >
-              {pendingApproval > 0 ? `${pendingApproval} Menunggu` : "0 Menunggu"}
+              {totalMutasi > 0 ? `${totalMutasi} Mutasi` : "0 Mutasi"}
             </span>
           </div>
         </div>

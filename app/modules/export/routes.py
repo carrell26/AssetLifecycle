@@ -113,11 +113,10 @@ def _get_movement_actor_name(movement):
     2. RequestApproval (approved_by)
     3. User dari relasi actor pada movement
     """
-    # 1. Cek dari audit log APPROVE_MOVEMENT
+    # 1. Cek dari audit log (MODULE_MUTATION atau APPROVE_MOVEMENT)
     audit = AuditLog.query.filter_by(
         table_name="module_movements",
         record_id=movement.movement_id,
-        aksi="APPROVE_MOVEMENT",
     ).first()
     if audit and audit.actor:
         return audit.actor.name

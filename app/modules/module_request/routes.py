@@ -210,8 +210,14 @@ def new_request():
 
 @module_request_bp.route("/requests")
 @login_required
-@role_required("admin", "karyawan_tif")
+@role_required("admin", "karyawan_tif", "teknisi")
 def list_requests():
+    import os
+    from flask import current_app
+    react_template_path = os.path.join(current_app.root_path, "templates", "react_index.html")
+    if os.path.exists(react_template_path) and not request.args.get("legacy"):
+        return render_template("react_index.html", current_user=current_user)
+
     if current_user.role == "teknisi":
         requests_list = (
             ModuleRequest.query.filter_by(requested_by=current_user.user_id)

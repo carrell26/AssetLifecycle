@@ -5,13 +5,13 @@ const INITIAL_NOTIFICATIONS = [
   {
     id: 1,
     category: "approval",
-    icon: "assignment",
+    icon: "swap_horiz",
     iconColor: "text-amber-400 bg-amber-500/15 border-amber-500/30",
     title: "Mutasi Modul Baru (PSS24-003)",
     desc: "Karyawan TIF mencatat mutasi modul di STO Palu 1.",
     time: "10 menit yang lalu",
     actions: [
-      { label: "Review", href: "/modules/requests", primary: true },
+      { label: "Buku Mutasi", href: "/modules/requests", primary: true },
       { label: "Detail", href: "/modules/requests", primary: false },
     ],
   },
@@ -50,10 +50,10 @@ const INITIAL_NOTIFICATIONS = [
     category: "approval",
     icon: "check_circle",
     iconColor: "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-    title: "Pengajuan Disetujui",
-    desc: "Mutasi modul Metro-002 Port 4 telah disetujui oleh Supervisor.",
+    title: "Mutasi Langsung Berhasil",
+    desc: "Mutasi modul Metro-002 Port 4 telah dicatat oleh Karyawan TIF.",
     time: "1 hari yang lalu",
-    badge: "Disetujui",
+    badge: "Tercatat",
   },
 ];
 
@@ -157,7 +157,7 @@ export default function NotificationFlyout() {
           >
             {[
               { id: "all", label: "Semua (5)" },
-              { id: "approval", label: "Persetujuan (2)" },
+              { id: "approval", label: "Mutasi (2)" },
               { id: "system", label: "Sistem (3)" },
             ].map((t) => {
               const active = filter === t.id;
